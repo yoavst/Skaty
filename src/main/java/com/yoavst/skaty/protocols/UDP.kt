@@ -1,6 +1,8 @@
-package com.yoavst.skaty.protocols.impl
+package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.protocols.*
+import com.yoavst.skaty.protocols.interfaces.IProtocol
+import com.yoavst.skaty.protocols.interfaces.IProtocolMarker
 import com.yoavst.skaty.utils.ToString
 import unsigned.Ushort
 import unsigned.us
@@ -16,7 +18,7 @@ data class UDP(var sport: Ushort = 53.us,
 
     override fun toString(): String = ToString.generate(this)
     override fun clone(): UDP = copy()
-    override val marker: IProtocolMarker<UDP> get() = UDP
+    override val marker: IProtocolMarker<UDP> get() = Companion
 
     companion object : IProtocolMarker<UDP> {
         override val name: String get() = "UDP"

@@ -1,8 +1,10 @@
-package com.yoavst.skaty.protocols.impl
+package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.model.*
 import com.yoavst.skaty.protocols.*
-import com.yoavst.skaty.protocols.impl.TCP.Option.Companion.format
+import com.yoavst.skaty.protocols.TCP.Option.Companion.format
+import com.yoavst.skaty.protocols.interfaces.IProtocol
+import com.yoavst.skaty.protocols.interfaces.IProtocolMarker
 import com.yoavst.skaty.utils.Struct
 import com.yoavst.skaty.utils.ToString
 import com.yoavst.skaty.utils.bufferOf
@@ -119,7 +121,7 @@ data class TCP(var sport: Ushort? = 20.us,
         companion object : Formatter<Options> {
             override fun format(value: Options?): String {
                 if (value == null) return "[]"
-                return value.joinToString(prefix = "[", postfix = "]", transform = Option.Companion::format)
+                return value.joinToString(prefix = "[", postfix = "]", transform = Option::format)
             }
 
         }

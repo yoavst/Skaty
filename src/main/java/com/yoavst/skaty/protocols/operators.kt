@@ -1,6 +1,9 @@
 package com.yoavst.skaty.protocols
 
-import com.yoavst.skaty.protocols.impl.Raw
+import com.yoavst.skaty.protocols.Raw
+import com.yoavst.skaty.protocols.interfaces.IContainerProtocol
+import com.yoavst.skaty.protocols.interfaces.IProtocol
+import com.yoavst.skaty.protocols.interfaces.IProtocolMarker
 import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KMutableProperty1

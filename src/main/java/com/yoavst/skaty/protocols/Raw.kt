@@ -1,8 +1,8 @@
-package com.yoavst.skaty.protocols.impl
+package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.protocols.BaseProtocol
-import com.yoavst.skaty.protocols.IProtocol
-import com.yoavst.skaty.protocols.IProtocolMarker
+import com.yoavst.skaty.protocols.interfaces.IProtocol
+import com.yoavst.skaty.protocols.interfaces.IProtocolMarker
 import com.yoavst.skaty.utils.ToString
 
 data class Raw(var load: String = "",
@@ -10,7 +10,7 @@ data class Raw(var load: String = "",
 
     override fun toString(): String = ToString.generate(this)
     override fun clone(): Raw = copy()
-    override val marker: IProtocolMarker<Raw> get() = Raw
+    override val marker: IProtocolMarker<Raw> get() = Companion
 
     companion object : IProtocolMarker<Raw> {
         override val name: String get() = "Raw"

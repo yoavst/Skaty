@@ -1,4 +1,4 @@
-package com.yoavst.skaty.protocols
+package com.yoavst.skaty.protocols.interfaces
 
 /**
  * A protocol that may contain another protocol as its payload.

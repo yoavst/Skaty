@@ -2,12 +2,11 @@ package com.yoavst.skaty
 
 import com.yoavst.skaty.model.flagsOf
 import com.yoavst.skaty.protocols.*
-import com.yoavst.skaty.protocols.impl.*
-import com.yoavst.skaty.protocols.impl.TCP.Companion.optionsOf
-import com.yoavst.skaty.protocols.impl.TCP.Flag.ACK
-import com.yoavst.skaty.protocols.impl.TCP.Flag.SYN
-import com.yoavst.skaty.protocols.impl.TCP.Option.Companion.NOP
-import com.yoavst.skaty.protocols.impl.TCP.Option.Companion.timestamp
+import com.yoavst.skaty.protocols.TCP.Companion.optionsOf
+import com.yoavst.skaty.protocols.TCP.Flag.ACK
+import com.yoavst.skaty.protocols.TCP.Flag.SYN
+import com.yoavst.skaty.protocols.TCP.Option.Companion.NOP
+import com.yoavst.skaty.protocols.TCP.Option.Companion.timestamp
 import unsigned.*
 
 fun main(args: Array<String>) {

@@ -1,4 +1,4 @@
-package com.yoavst.skaty.protocols
+package com.yoavst.skaty.protocols.interfaces
 
 interface IProtocol<K : IProtocol<K>> : Cloneable {
     /**

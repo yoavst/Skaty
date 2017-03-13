@@ -1,4 +1,4 @@
-package com.yoavst.skaty.protocols
+package com.yoavst.skaty.protocols.interfaces
 
 /**
  * Static extension for the protocol [K].

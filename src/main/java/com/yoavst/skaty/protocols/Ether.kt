@@ -1,9 +1,11 @@
-package com.yoavst.skaty.protocols.impl
+package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.model.Exclude
 import com.yoavst.skaty.model.Formatted
 import com.yoavst.skaty.model.Formatter
 import com.yoavst.skaty.protocols.*
+import com.yoavst.skaty.protocols.interfaces.IProtocol
+import com.yoavst.skaty.protocols.interfaces.IProtocolMarker
 import com.yoavst.skaty.utils.ToString
 import unsigned.*
 
@@ -21,7 +23,7 @@ data class Ether(
 
     override fun toString(): String = ToString.generate(this)
     override fun clone(): Ether = copy()
-    override val marker: IProtocolMarker<Ether> get() = Ether
+    override val marker: IProtocolMarker<Ether> get() = Companion
 
     companion object : IProtocolMarker<Ether> {
         override val name: String get() = "Ethernet"

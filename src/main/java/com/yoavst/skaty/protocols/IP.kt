@@ -1,7 +1,9 @@
-package com.yoavst.skaty.protocols.impl
+package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.model.*
 import com.yoavst.skaty.protocols.*
+import com.yoavst.skaty.protocols.interfaces.IProtocol
+import com.yoavst.skaty.protocols.interfaces.IProtocolMarker
 import com.yoavst.skaty.utils.ToString
 import unsigned.*
 
@@ -33,7 +35,7 @@ data class IP(var version: Ubyte = 4.ub,
 
     override fun toString(): String = ToString.generate(this)
     override fun clone(): IP = copy()
-    override val marker: IProtocolMarker<IP> get() = IP
+    override val marker: IProtocolMarker<IP> get() = Companion
 
     companion object : IProtocolMarker<IP> {
         override val name: String get() = "IP"
