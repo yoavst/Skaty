@@ -15,9 +15,12 @@ fun main(args: Array<String>) {
             IP(dst = ip("192.168.1.1")) /
             TCP(dport = 80.us, sport = 1200.us, flags = flagsOf(SYN, ACK), options = optionsOf(NOP(), timestamp(1489416311.ui, 1.ui))) /
             "Hello world"
+
+    // work with properties
+    packet.dst = mac("AA-BB-CC-DD-EE-FF")
+    del(packet::dst)
     println(packet)
-    del(packet::src)
-    println(packet)
+
     // get a layer
     val tcp = packet[TCP]
     println(tcp.dport)

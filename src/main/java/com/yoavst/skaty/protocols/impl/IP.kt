@@ -67,12 +67,18 @@ data class IP(var version: Ubyte = 4.ub,
     }
 
     object Protocol : Formatter<Ubyte> {
+        val ICMP = 1.ub
+        val IP = 4.ub
         val TCP = 6.ub
         val UDP = 17.ub
+        val GRE = 47.ub
 
         var KnownFormats: MutableMap<Ubyte, String> = mutableMapOf(
+                ICMP to "ICMP",
+                IP to "IP",
                 TCP to "TCP",
-                UDP to "UDP"
+                UDP to "UDP",
+                GRE to "GRE"
         )
 
         override fun format(value: Ubyte?): String = KnownFormats.getOrDefault(value ?: 0.ub, "$value")
