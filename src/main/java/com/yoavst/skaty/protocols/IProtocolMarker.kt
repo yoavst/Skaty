@@ -1,8 +1,5 @@
 package com.yoavst.skaty.protocols
 
-import com.yoavst.skaty.field.Field
-import kotlin.reflect.KProperty
-
 /**
  * Static extension for the protocol [K].
  */
@@ -20,7 +17,8 @@ interface IProtocolMarker<K : IProtocol<K>> {
     val name: String
 
     /**
-     * All the fields of the protocol
+     * Immutable version of the defaultValue value of the protocol.
+     * Changing fields inside the defaultValue value has undefined behavior
      */
-    val fields: Set<KProperty<Field<*>>>
+    val defaultValue: K
 }

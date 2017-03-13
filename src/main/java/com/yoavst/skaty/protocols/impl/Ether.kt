@@ -1,76 +1,52 @@
 package com.yoavst.skaty.protocols.impl
 
-import com.yoavst.skaty.field.Field
-import com.yoavst.skaty.field.NullableMACAddressField
-import com.yoavst.skaty.field.UShortField
+import com.yoavst.skaty.model.Exclude
+import com.yoavst.skaty.model.Formatted
+import com.yoavst.skaty.model.Formatter
 import com.yoavst.skaty.protocols.*
-import unsigned.Ulong
-import unsigned.Ushort
-import unsigned.us
-import kotlin.properties.Delegates
-import kotlin.reflect.KProperty
+import com.yoavst.skaty.utils.ToString
+import unsigned.*
 
-class Ether(
-        dst: MAC? = null,
-        src: MAC? = null,
-        type: Ushort? = null,
-        payload: IProtocol<*>? = null) : IContainerProtocol<Ether>, Layer2 {
-    override var payload: IProtocol<*>? by Delegates.observable(payload) { _, _, new ->
-        (new as? Aware)?.onPayload(this)
-    }
+data class Ether(
+        var dst: MAC? = null,
+        var src: MAC? = null,
+        @property:Formatted(Type::class) var type: Ushort = 0.us,
+        @property:Exclude private var _payload: IProtocol<*>? = null) : BaseProtocol<Ether>(), Layer2 {
+    override var payload: IProtocol<*>?
+        get() = _payload
+        set(value) {
+            _payload = value
+            (value as? Aware)?.onPayload(this)
+        }
 
-    val dst: NullableMACAddressField = NullableMACAddressField("destination address", null).apply { setIf(dst) }
-    val src: NullableMACAddressField = NullableMACAddressField("source address", null).apply { setIf(src) }
-    val type: UShortField = UShortField("type", 0.us).apply { setIf(type) }
+    override fun toString(): String = ToString.generate(this)
+    override fun clone(): Ether = copy()
+    override val marker: IProtocolMarker<Ether> get() = Ether
 
-    fun copy(dst: MAC? = null, src: MAC? = null, type: Ushort? = null, payload: IProtocol<*>? = null): Ether {
-        return Ether(dst ?: this.dst(), src ?: this.src(), type ?: this.type(), payload ?: this.payload)
-    }
-
-    data class MAC(val raw: Ulong) {
-        override fun toString(): String = raw.toFormattedMacAddress()
+    companion object : IProtocolMarker<Ether> {
+        override val name: String get() = "Ethernet"
+        override fun isProtocol(protocol: IProtocol<*>): Boolean = protocol is Ether
+        override val defaultValue: Ether = Ether()
     }
 
     interface Aware {
         fun onPayload(ether: Ether)
     }
 
-    //region Object methods
-    override fun toString(): String {
-        return "Ether(dst=$dst, src=$src, type=$type) -> $payload"
+    //region Data objects
+    data class MAC(val raw: Ulong) {
+        override fun toString(): String = raw.toFormattedMacAddress()
     }
 
-    override fun clone(): Ether = copy()
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Ether) return false
+    object Type: Formatter<Ushort> {
+        val IP = 0x0800.us
 
-        if (payload != other.payload) return false
-        if (dst != other.dst) return false
-        if (src != other.src) return false
-        if (type != other.type) return false
+        var KnownFormats: MutableMap<Ushort, String> = mutableMapOf(
+                IP to "IP"
+        )
 
-        return true
+        override fun format(value: Ushort?): String = KnownFormats.getOrDefault(value ?: 0.us, "$value")
     }
-
-    override fun hashCode(): Int {
-        var result = payload?.hashCode() ?: 0
-        result = 31 * result + dst.hashCode()
-        result = 31 * result + src.hashCode()
-        result = 31 * result + type.hashCode()
-        return result
-    }
-
-    override val marker: IProtocolMarker<Ether> get() = Ether
-
     //endregion
-    companion object : IProtocolMarker<Ether> {
-        override val name: String get() = "Ethernet"
-        override val fields: Set<KProperty<Field<*>>> = setOf(Ether::dst, Ether::src, Ether::type)
-
-        override fun isProtocol(protocol: IProtocol<*>): Boolean = protocol is Ether
-
-        val TYPE_IP = 0x0800.us
-    }
 }
 

@@ -1,6 +1,11 @@
 package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.protocols.impl.Raw
+import kotlin.jvm.internal.CallableReference
+import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KProperty
+import kotlin.reflect.jvm.javaMethod
 
 operator fun <K : IContainerProtocol<*>> K.div(protocol: IProtocol<*>): K {
     val payload = this.payload
@@ -20,11 +25,28 @@ operator fun IProtocol<*>?.contains(protocol: IProtocolMarker<*>): Boolean {
 
 @Suppress("UNCHECKED_CAST")
 operator fun <K : IProtocol<K>> IProtocol<*>?.get(protocol: IProtocolMarker<K>): K {
-    if (this == null) throwNotFound(protocol)
+    return getOrNull(protocol) ?: throw IllegalArgumentException("Protocol ${protocol.name} is not found")
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <K : IProtocol<K>> IProtocol<*>?.getOrNull(protocol: IProtocolMarker<K>): K? {
+    if (this == null) return null
     if (protocol.isProtocol(this)) return this as K
-    else if (this !is IContainerProtocol<*>) throwNotFound(protocol)
+    else if (this !is IContainerProtocol<*>) return null
     else return payload[protocol]
 }
 
-@Suppress("NOTHING_TO_INLINE")
-inline fun throwNotFound(protocol: IProtocolMarker<*>): Nothing = throw IllegalArgumentException("Protocol ${protocol.name} is not found")
+fun <T> del(property: KMutableProperty0<T>) {
+    // property.setter.call(property.getter.call((property.instanceParameter as? IProto<*>)?.marker?.defaultValue))
+    property.set(property.default())
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T> KProperty<T>.default(): T {
+    return getter.javaMethod!!.invoke(((this as? CallableReference)?.boundReceiver as? IProtocol<*>)?.marker?.defaultValue) as T
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T> KProperty<Any?>.default(instance: IProtocol<*>): T {
+    return getter.javaMethod!!.invoke(instance.marker.defaultValue) as T
+}

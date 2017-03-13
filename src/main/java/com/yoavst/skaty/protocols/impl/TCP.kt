@@ -1,49 +1,44 @@
 package com.yoavst.skaty.protocols.impl
 
-import com.yoavst.skaty.field.*
-import com.yoavst.skaty.model.BaseOptions
-import com.yoavst.skaty.model.Flags
-import com.yoavst.skaty.model.flagsOf
+import com.yoavst.skaty.model.*
 import com.yoavst.skaty.protocols.*
+import com.yoavst.skaty.protocols.impl.TCP.Option.Companion.format
+import com.yoavst.skaty.utils.Struct
+import com.yoavst.skaty.utils.ToString
+import com.yoavst.skaty.utils.bufferOf
 import unsigned.*
-import kotlin.reflect.KProperty
 
-class TCP constructor(sport: Ushort? = null,
-                      dport: Ushort? = null,
-                      seq: Uint? = null,
-                      ack: Uint? = null,
-                      dataofs: Boolean? = null,
-                      reserved: Boolean? = null,
-                      flags: Flags<Flag>? = null,
-                      window: Ushort? = null,
-                      chksum: Ushort? = null,
-                      urgptr: Ushort? = null,
-                      options: Options? = null,
-                      override var payload: IProtocol<*>? = null) : IContainerProtocol<TCP>, IP.Aware, Layer4 {
-    val sport: UShortField = UShortField("source port", 20.us).apply { setIf(sport) }
-    val dport: UShortField = UShortField("destination port", 80.us).apply { setIf(dport) }
-    val seq: UIntField = UIntField("sequence number", 0.ui).apply { setIf(seq) }
-    val ack: UIntField = UIntField("acknowledge number", 0.ui).apply { setIf(ack) }
-    val dataofs: BitField = BitField("dataofs", false).apply { setIf(dataofs) }
-    val reserved: BitField = BitField("dataofs", false).apply { setIf(reserved) }
-    val flags: FlagsField<Flag> = FlagsField("flags", flagsOf(Flag.SYN)).apply { setIf(flags) }
-    val window: UShortField = UShortField("window size", 8192.us).apply { setIf(window) }
-    val chksum: NullableUShortField = NullableUShortField("checksum", null).apply { setIf(chksum) }
-    val urgptr: UShortField = UShortField("urgptr", 0.us).apply { setIf(urgptr) }
-    val options: OptionsField<Options, Option> = OptionsField("tcp options", emptyOptions()).apply { setIf(options) }
-
+data class TCP(var sport: Ushort? = 20.us,
+               var dport: Ushort? = 80.us,
+               var seq: Uint? = 0.ui,
+               var ack: Uint? = 0.ui,
+               var dataofs: Boolean = false,
+               var reserved: Boolean = false,
+               var flags: Flags<Flag> = flagsOf(Flag.SYN),
+               var window: Ushort = 8192.us,
+               var chksum: Ushort? = null,
+               var urgptr: Ushort? = 0.us,
+               var options: Options = emptyOptions(),
+               override var payload: IProtocol<*>? = null) : BaseProtocol<TCP>(), IP.Aware, Layer4 {
     override fun onPayload(ip: IP) {
-        ip.proto.value = IP.PROTOCOL_TCP
+        ip.proto = IP.Protocol.TCP
     }
 
-    fun copy(sport: Ushort? = null, dport: Ushort? = null, seq: Uint? = null, ack: Uint? = null, dataofs: Boolean? = null,
-             reserved: Boolean? = null, flags: Flags<Flag>? = null, window: Ushort? = null, chksum: Ushort? = null, urgptr: Ushort? = null,
-             options: Options? = null, payload: IProtocol<*>? = null): TCP {
-        return TCP(sport ?: this.sport(), dport ?: this.dport(), seq ?: this.seq(), ack ?: this.ack(),
-                dataofs ?: this.dataofs(), reserved ?: this.reserved(), flags ?: this.flags(), window ?: this.window(),
-                chksum ?: this.chksum(), urgptr ?: this.urgptr(), options ?: this.options(), payload ?: this.payload)
+    override fun toString(): String = ToString.generate(this)
+
+    override fun clone(): TCP = copy()
+    override val marker: IProtocolMarker<TCP> get() = Companion
+
+    companion object : IProtocolMarker<TCP> {
+        override val name: String get() = "TCP"
+        override fun isProtocol(protocol: IProtocol<*>): Boolean = protocol is TCP
+        override val defaultValue: TCP = TCP()
+
+        fun optionsOf(vararg options: Option) = Options(options.toList())
+        fun emptyOptions() = optionsOf()
     }
 
+    //region Data objects
     enum class Flag(val value: Int) {
         FIN(0x01),
         SYN(0x02),
@@ -54,8 +49,9 @@ class TCP constructor(sport: Ushort? = null,
         ECE(0x40),
         CWR(0x80)
     }
+    //endregion
 
-
+    //region Options
     data class Option(val kind: Ubyte, val length: Ubyte? = null, val data: ByteArray? = null) {
         override fun equals(other: Any?): Boolean {
             return other === this || (other is Option && other.kind == kind && other.length == length &&
@@ -69,9 +65,39 @@ class TCP constructor(sport: Ushort? = null,
             return result
         }
 
-        companion object {
-            fun NOP() = Option(1.ub)
+        companion object : Formatter<Option> {
+            val KnownEmptyOptions: MutableMap<Ubyte, String> = mutableMapOf(
+                    0.ub to "EOL",
+                    1.ub to "NOP"
+            )
+            val KnownOptionsWithData: MutableMap<Ubyte, Pair<String, String>> = mutableMapOf(
+                    2.ub to ("MSS" to "H"),
+                    3.ub to ("WScale" to "B"),
+                    4.ub to ("SAckOK" to ""),
+                    5.ub to ("SAck" to "P"),
+                    8.ub to ("Timestamp" to "II"),
+                    14.ub to ("AltChkSum" to "B"),
+                    15.ub to ("AltChkSumOpt" to "P"),
+                    25.ub to ("Mood" to "p"),
+                    28.ub to ("UTO" to "H"),
+                    34.ub to ("TFO" to "II")
+            )
+
+            override fun format(value: Option?): String {
+                val kind = value?.kind ?: return ""
+                return KnownEmptyOptions[kind] ?: KnownOptionsWithData[kind]?.let { (name, format) ->
+                    "$name:${Struct.parse(format, value.data ?: ByteArray(0))}"
+                } ?: "$value"
+            }
+
             fun endOfOptions() = Option(0.ub)
+            fun NOP() = Option(1.ub)
+            fun maxSegSize(size: Ushort) = Option(2.ub, 4.ub, bufferOf(size))
+            fun shiftCount(size: Ubyte) = Option(3.ub, 3.ub, byteArrayOf(size.toByte()))
+            fun selectiveAckOK() = Option(4.ub, 2.ub)
+            fun timestamp(time: Uint, echoReplayTime: Uint) = Option(8.ub, 8.ub, bufferOf(time, echoReplayTime))
+            fun altChecksum(algorithm: Ubyte) = Option(14.ub, 3.ub, byteArrayOf(algorithm.toByte()))
+            fun altChecksumOpt(checksum: ByteArray) = Option(15.ub, checksum.size.ub, checksum)
         }
     }
 
@@ -88,64 +114,18 @@ class TCP constructor(sport: Ushort? = null,
      * - An Option-Kind byte of 0x00 is the End Of Options option, and is also only one byte.
      *
      */
-    class Options internal constructor(options: List<Option>) : BaseOptions<Options, Option>(), List<Option> by options
+    @Formatted(Options::class)
+    class Options internal constructor(options: List<Option>) : BaseOptions<Options, Option>(), List<Option> by options {
+        companion object : Formatter<Options> {
+            override fun format(value: Options?): String {
+                if (value == null) return "[]"
+                return value.joinToString(prefix = "[", postfix = "]", transform = Option.Companion::format)
+            }
 
-    //region Object methods
-    override fun toString(): String {
-        return "TCP(sport=${sport()}, dport=${dport()}, seq=${seq()}, ack=${ack()}, dataofs=${dataofs()}, reserved=${reserved()}, flags=${flags()}, window=${window()}, chksum=${chksum()}, urgptr=${urgptr()}, options=${options()}) -> $payload"
+        }
     }
-
-    override fun clone(): TCP = copy()
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is TCP) return false
-
-        if (payload != other.payload) return false
-        if (sport != other.sport) return false
-        if (dport != other.dport) return false
-        if (seq != other.seq) return false
-        if (ack != other.ack) return false
-        if (dataofs != other.dataofs) return false
-        if (reserved != other.reserved) return false
-        if (flags != other.flags) return false
-        if (window != other.window) return false
-        if (chksum != other.chksum) return false
-        if (urgptr != other.urgptr) return false
-        if (options != other.options) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = payload?.hashCode() ?: 0
-        result = 31 * result + sport.hashCode()
-        result = 31 * result + dport.hashCode()
-        result = 31 * result + seq.hashCode()
-        result = 31 * result + ack.hashCode()
-        result = 31 * result + dataofs.hashCode()
-        result = 31 * result + reserved.hashCode()
-        result = 31 * result + flags.hashCode()
-        result = 31 * result + window.hashCode()
-        result = 31 * result + chksum.hashCode()
-        result = 31 * result + urgptr.hashCode()
-        result = 31 * result + options.hashCode()
-        return result
-    }
-
-    override val marker: IProtocolMarker<TCP> get() = Companion
-
     //endregion
-    companion object : IProtocolMarker<TCP> {
-        override val name: String get() = "TCP"
-        override val fields: Set<KProperty<Field<*>>> = setOf(
-                TCP::sport, TCP::dport, TCP::seq, TCP::ack, TCP::dataofs, TCP::reserved,
-                TCP::flags, TCP::window, TCP::chksum, TCP::urgptr, TCP::options
-        )
 
-        override fun isProtocol(protocol: IProtocol<*>): Boolean = protocol is TCP
-
-        fun optionsOf(vararg options: Option) = Options(options.toList())
-        fun emptyOptions() = optionsOf()
-    }
 }
 
 
