@@ -31,4 +31,3 @@ internal fun Ulong.toFormattedMacAddress(): String {
             (this shr 8).toUbyte().toInt().toString(16) + "-" +
             (this shr 0).toUbyte().toInt().toString(16)).toUpperCase()
 }
-

@@ -3,7 +3,6 @@ package com.yoavst.skaty.protocols
 import com.yoavst.skaty.model.Exclude
 import com.yoavst.skaty.model.Formatted
 import com.yoavst.skaty.model.Formatter
-import com.yoavst.skaty.protocols.*
 import com.yoavst.skaty.protocols.interfaces.IProtocol
 import com.yoavst.skaty.protocols.interfaces.IProtocolMarker
 import com.yoavst.skaty.utils.ToString

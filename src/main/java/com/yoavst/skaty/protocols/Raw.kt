@@ -1,13 +1,10 @@
 package com.yoavst.skaty.protocols
 
-import com.yoavst.skaty.protocols.BaseProtocol
 import com.yoavst.skaty.protocols.interfaces.IProtocol
 import com.yoavst.skaty.protocols.interfaces.IProtocolMarker
 import com.yoavst.skaty.utils.ToString
 
-data class Raw(var load: String = "",
-               override var payload: IProtocol<*>? = null) : BaseProtocol<Raw>() {
-
+data class Raw(var load: String = "") : IProtocol<Raw> {
     override fun toString(): String = ToString.generate(this)
     override fun clone(): Raw = copy()
     override val marker: IProtocolMarker<Raw> get() = Companion

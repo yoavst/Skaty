@@ -10,9 +10,6 @@ import kotlin.experimental.xor
  * Created by GBarbieri on 06.10.2016.
  */
 
-infix fun Long.udiv(b: Long) = java.lang.Long.divideUnsigned(this, b)
-infix fun Long.urem(b: Long) = java.lang.Long.remainderUnsigned(this, b)
-infix fun Long.ucmp(b: Long) = java.lang.Long.compareUnsigned(this, b)
 // Long.ushl(b: Long) is already provided by Kotlin lib
 
 // TODO if == unsigned.Ubyte?
@@ -41,7 +38,7 @@ data class Ubyte(var v: Byte = 0) : Number() {
          */
         const val MAX_VALUE = 0xff
 
-        fun checkSigned(v: Number) = v.toInt() >= MIN_VALUE && v.toInt() <= MAX_VALUE
+        fun checkSigned(v: Number) = v.toInt() in MIN_VALUE..MAX_VALUE
     }
 
 
@@ -126,7 +123,7 @@ data class Uint(var v: Int = 0) : Number() {
          */
         const val MAX_VALUE = 0xffffffffL
 
-        fun checkSigned(v: Number) = v.toLong() >= MIN_VALUE && v.toLong() <= MAX_VALUE
+        fun checkSigned(v: Number) = v.toLong() in MIN_VALUE..MAX_VALUE
     }
 
 
@@ -200,7 +197,7 @@ data class Ulong(var v: Long = 0) : Number(), Comparable<Ulong> {
          */
         val MAX_VALUE = BigInteger("18446744073709551615")
 
-        fun checkSigned(v: Number) = BigInteger.valueOf(v.toLong()) >= MIN_VALUE && BigInteger.valueOf(v.toLong()) <= MAX_VALUE
+        fun checkSigned(v: Number) = BigInteger.valueOf(v.toLong()) in MIN_VALUE..MAX_VALUE
     }
 
     constructor(number: Number) : this(number.toLong())
@@ -262,7 +259,7 @@ data class Ulong(var v: Long = 0) : Number(), Comparable<Ulong> {
 
         override fun iterator(): Iterator<Ulong> = UlongIterator(this)
 
-        override fun contains(value: Ulong) = start <= value && value <= endInclusive
+        override fun contains(value: Ulong): Boolean = value in start..endInclusive
     }
 
     class UlongIterator(val ulongRange: UlongRange) : Iterator<Ulong> {
@@ -360,21 +357,8 @@ data class Ushort(var v: Short = 0) : Number() {
     operator fun compareTo(b: Int) = Integer.compareUnsigned(toInt(), b)
 }
 
-
-
-
-
-
-
-
-operator fun Long.plus(b: Ulong) = this + b.toLong()
-operator fun Long.minus(b: Ulong) = this - b.toLong()
-operator fun Long.times(b: Ulong) = this * b.toLong()
 operator fun Long.div(b: Ulong) = java.lang.Long.divideUnsigned(this, b.toLong())
 operator fun Long.rem(b: Ulong) = java.lang.Long.remainderUnsigned(this, b.toLong())
-infix fun Long.and(b: Ulong) = this and b.toLong()
-infix fun Long.or(b: Ulong) = this or b.toLong()
-infix fun Long.xor(b: Ulong) = this xor b.toLong()
 // no main.unsigned.shl, main.unsigned.shr, since they need int
 infix operator fun Long.compareTo(b: Ulong) = java.lang.Long.compareUnsigned(this, b.toLong())
 

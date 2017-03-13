@@ -1,7 +1,6 @@
 package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.model.*
-import com.yoavst.skaty.protocols.*
 import com.yoavst.skaty.protocols.interfaces.IProtocol
 import com.yoavst.skaty.protocols.interfaces.IProtocolMarker
 import com.yoavst.skaty.utils.ToString

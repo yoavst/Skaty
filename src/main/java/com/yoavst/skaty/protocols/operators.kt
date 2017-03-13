@@ -40,7 +40,6 @@ fun <K : IProtocol<K>> IProtocol<*>?.getOrNull(protocol: IProtocolMarker<K>): K?
 }
 
 fun <T> del(property: KMutableProperty0<T>) {
-    // property.setter.call(property.getter.call((property.instanceParameter as? IProto<*>)?.marker?.defaultValue))
     property.set(property.default())
 }
 
