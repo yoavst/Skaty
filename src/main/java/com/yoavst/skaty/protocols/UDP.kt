@@ -1,5 +1,7 @@
 package com.yoavst.skaty.protocols
 
+import com.yoavst.skaty.model.Formatted
+import com.yoavst.skaty.model.UshortHexFormatter
 import com.yoavst.skaty.protocols.interfaces.IProtocol
 import com.yoavst.skaty.protocols.interfaces.IProtocolMarker
 import com.yoavst.skaty.utils.ToString
@@ -9,7 +11,7 @@ import unsigned.us
 data class UDP(var sport: Ushort = 53.us,
                var dport: Ushort = 53.us,
                var len: Ushort? = null,
-               var chksum: Ushort? = null,
+               @property:Formatted(UshortHexFormatter::class) var chksum: Ushort? = null,
                override var payload: IProtocol<*>? = null) : BaseProtocol<UDP>(), IP.Aware, Layer4 {
     override fun onPayload(ip: IP) {
         ip.proto = IP.Protocol.UDP

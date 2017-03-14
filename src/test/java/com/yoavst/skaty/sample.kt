@@ -7,14 +7,16 @@ import com.yoavst.skaty.protocols.TCP.Flag.ACK
 import com.yoavst.skaty.protocols.TCP.Flag.SYN
 import com.yoavst.skaty.protocols.TCP.Option.Companion.NOP
 import com.yoavst.skaty.protocols.TCP.Option.Companion.timestamp
+import com.yoavst.skaty.utils.Help
 import unsigned.*
 
 fun main(args: Array<String>) {
     val packet = Ether(src = mac("11-22-33-44-55-66")) /
-            IP(dst = ip("192.168.1.1")) /
-            TCP(dport = 80.us, sport = 1200.us, flags = flagsOf(SYN, ACK), options = optionsOf(NOP(), timestamp(1489416311.ui, 1.ui))) /
+            IP(dst = ip("192.168.1.1"), tos = 53.ub) /
+            TCP(dport = 80.us, sport = 1200.us, flags = flagsOf(SYN, ACK), options = optionsOf(NOP(), timestamp(1489416311.ui, 1.ui)), chksum = 53432.us) /
             "Hello world"
-
+    println(Help.generate(TCP))
+    println()
     // work with properties
     packet.dst = mac("AA-BB-CC-DD-EE-FF")
     del(packet::dst)

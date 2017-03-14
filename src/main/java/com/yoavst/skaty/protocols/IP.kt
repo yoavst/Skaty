@@ -8,6 +8,7 @@ import unsigned.*
 
 data class IP(var version: Ubyte = 4.ub,
               var ihl: Ubyte? = null,
+              @property:Formatted(UByteHexFormatter::class)
               var tos: Ubyte = 0.ub,
               var ecn: ECN = ECN.NonECT,
               var len: Ushort? = null,
@@ -15,7 +16,7 @@ data class IP(var version: Ubyte = 4.ub,
               var flags: Flags<Flag>? = emptyFlags(),
               var ttl: Ubyte = 64.ub,
               @property:Formatted(Protocol::class) var proto: Ubyte? = 0.ub,
-              var chksum: Ushort? = null,
+              @property:Formatted(UshortHexFormatter::class) var chksum: Ushort? = null,
               var src: Address? = null,
               var dst: Address = ip("127.0.0.1"),
               var options: Options = emptyOptions(),
@@ -100,6 +101,10 @@ data class IP(var version: Ubyte = 4.ub,
             result = 31 * result + length.hashCode()
             result = 31 * result + (data?.contentHashCode() ?: 0)
             return result
+        }
+
+        companion object {
+            fun endOfOptions() = IP.Option(false, Class.Control, 0, 0.ub)
         }
     }
 

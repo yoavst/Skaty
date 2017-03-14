@@ -6,9 +6,9 @@ import unsigned.toUint
 import unsigned.toUlong
 import java.math.BigInteger
 
-typealias IProtocol<T> = com.yoavst.skaty.protocols.interfaces.IProtocol<T>
-typealias IContainerProtocol<T> = com.yoavst.skaty.protocols.interfaces.IContainerProtocol<T>
-typealias IProtocolMarker<T> = com.yoavst.skaty.protocols.interfaces.IProtocolMarker<T>
+typealias IProtocol<K> = com.yoavst.skaty.protocols.interfaces.IProtocol<K>
+typealias IContainerProtocol<K> = com.yoavst.skaty.protocols.interfaces.IContainerProtocol<K>
+typealias IProtocolMarker<K> = com.yoavst.skaty.protocols.interfaces.IProtocolMarker<K>
 
 fun mac(address: String): Ether.MAC = Ether.MAC(address.toMacAddress())
 fun ip(address: String): IP.Address {
