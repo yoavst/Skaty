@@ -1,4 +1,4 @@
-package com.yoavst.skaty.utils
+package com.yoavst.skaty.serialization
 
 import unsigned.Uint
 import unsigned.Ushort

@@ -5,7 +5,7 @@ import com.yoavst.skaty.protocols.interfaces.IProtocol
 import com.yoavst.skaty.protocols.interfaces.IProtocolMarker
 import com.yoavst.skaty.utils.Struct
 import com.yoavst.skaty.utils.ToString
-import com.yoavst.skaty.utils.bufferOf
+import com.yoavst.skaty.serialization.bufferOf
 import unsigned.*
 
 data class TCP(var sport: Ushort? = 20.us,

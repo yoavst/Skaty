@@ -15,8 +15,9 @@ fun main(args: Array<String>) {
             IP(dst = ip("192.168.1.1"), tos = 53.ub) /
             TCP(dport = 80.us, sport = 1200.us, flags = flagsOf(SYN, ACK), options = optionsOf(NOP(), timestamp(1489416311.ui, 1.ui)), chksum = 53432.us) /
             "Hello world"
-    println(Help.generate(TCP))
-    println()
+
+    ls(IP)
+
     // work with properties
     packet.dst = mac("AA-BB-CC-DD-EE-FF")
     del(packet::dst)
