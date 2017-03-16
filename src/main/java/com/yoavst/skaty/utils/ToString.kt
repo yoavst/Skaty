@@ -2,8 +2,8 @@ package com.yoavst.skaty.utils
 
 import com.yoavst.skaty.model.Exclude
 import com.yoavst.skaty.protocols.default
-import com.yoavst.skaty.protocols.interfaces.IContainerProtocol
-import com.yoavst.skaty.protocols.interfaces.IProtocol
+import com.yoavst.skaty.protocols.declarations.IContainerProtocol
+import com.yoavst.skaty.protocols.declarations.IProtocol
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
 
@@ -33,5 +33,16 @@ object ToString : BasePrinter() {
             append('>')
         }
         return builder.toString()
+    }
+
+    private val hexArray = "0123456789ABCDEF".toCharArray()
+    fun toHex(bytes: ByteArray): String {
+        val hexChars = CharArray(bytes.size * 2)
+        for (j in bytes.indices) {
+            val v = bytes[j].toInt()
+            hexChars[j * 2] = hexArray[v.ushr(4)]
+            hexChars[j * 2 + 1] = hexArray[v and 0x0F]
+        }
+        return String(hexChars)
     }
 }

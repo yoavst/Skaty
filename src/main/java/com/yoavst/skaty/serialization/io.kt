@@ -30,8 +30,12 @@ interface SimpleReader : Closeable {
     fun readShort(): Short
     fun readInt(): Int
     fun readLong(): Long
+    /**
+     * if [length] == -1, read all the buffer
+     */
     fun readByteArray(length: Int): ByteArray
     fun skip(bytes: Int): Int
+    fun hasMore(): Boolean
 }
 
 fun SimpleReader.readUbyte() = readByte().ub
@@ -39,3 +43,4 @@ fun SimpleReader.readUshort() = readShort().us
 fun SimpleReader.readUint() = readInt().ui
 fun SimpleReader.readUlong() = readLong().ul
 fun SimpleReader.readString(length: Int, charset: Charset): String = String(readByteArray(length), charset)
+fun SimpleReader.readAsByteArray(): ByteArray = readByteArray(-1)

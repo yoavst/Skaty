@@ -2,18 +2,34 @@ package com.yoavst.skaty
 
 import com.yoavst.skaty.model.flagsOf
 import com.yoavst.skaty.protocols.*
-import com.yoavst.skaty.protocols.TCP.Companion.optionsOf
-import com.yoavst.skaty.protocols.TCP.Flag.ACK
-import com.yoavst.skaty.protocols.TCP.Flag.SYN
-import com.yoavst.skaty.protocols.TCP.Option.Companion.NOP
-import com.yoavst.skaty.protocols.TCP.Option.Companion.timestamp
-import com.yoavst.skaty.utils.Help
+import com.yoavst.skaty.protocols.TCP.Flag.*
+import com.yoavst.skaty.serialization.ByteArraySimpleReader
 import unsigned.*
+import java.io.File
 
 fun main(args: Array<String>) {
+    val data = hexStringToByteArray(testResourceOf("sample.bin").readText())
+    val packet = Ether.of(ByteArraySimpleReader(data))
+    println(packet)
+}
+
+fun testResourceOf(file: String): File = File("src/test/resources/$file")
+
+fun hexStringToByteArray(s: String): ByteArray {
+    val len = s.length
+    val data = ByteArray(len / 2)
+    var i = 0
+    while (i < len) {
+        data[i / 2] = ((Character.digit(s[i], 16) shl 4) + Character.digit(s[i + 1], 16)).toByte()
+        i += 2
+    }
+    return data
+}
+
+fun showcase() {
     val packet = Ether(src = mac("11-22-33-44-55-66")) /
-            IP(dst = ip("192.168.1.1"), tos = 53.ub) /
-            TCP(dport = 80.us, sport = 1200.us, flags = flagsOf(SYN, ACK), options = optionsOf(NOP(), timestamp(1489416311.ui, 1.ui)), chksum = 53432.us) /
+            IP(dst = ip("192.168.1.1"), tos = 53.ub, options = optionsOf(IPOption.MTUProb(22.us))) /
+            TCP(dport = 80.us, sport = 1200.us, flags = flagsOf(SYN, ACK), options = optionsOf(TCPOption.NOP, TCPOption.Timestamp(1489416311.ui, 1.ui)), chksum = 53432.us) /
             "Hello world"
 
     ls(IP)
@@ -40,7 +56,6 @@ fun main(args: Array<String>) {
     // sniff
     val packets = sniff().filter { TCP in it && it[TCP].dport == 1200.us }.timeout(2000).take(10).map { item -> item[TCP].ack }.toList()
     packets.forEach(::println)
-
 }
 
 fun sendp(packet: Layer2) {}

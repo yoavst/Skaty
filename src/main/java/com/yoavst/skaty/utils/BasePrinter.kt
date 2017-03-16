@@ -3,7 +3,7 @@ package com.yoavst.skaty.utils
 import com.yoavst.skaty.model.Formatted
 import com.yoavst.skaty.model.Formatter
 import com.yoavst.skaty.model.formatter
-import com.yoavst.skaty.protocols.interfaces.IProtocol
+import com.yoavst.skaty.protocols.declarations.IProtocol
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.findAnnotation

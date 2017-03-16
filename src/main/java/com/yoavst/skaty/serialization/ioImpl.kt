@@ -16,15 +16,19 @@ class ByteArraySimpleWriter(private val buffer: ByteBuffer, private val closing:
     override fun writeBool(value: Boolean) {
         buffer.put(if (value) 0.toByte() else 1.toByte())
     }
+
     override fun writeByte(value: Byte) {
         buffer.put(value)
     }
+
     override fun writeShort(value: Short) {
         buffer.putShort(value)
     }
+
     override fun writeInt(value: Int) {
         buffer.putInt(value)
     }
+
     override fun writeLong(value: Long) {
         buffer.putLong(value)
     }
@@ -41,18 +45,44 @@ class ByteArraySimpleWriter(private val buffer: ByteBuffer, private val closing:
     override fun array(): ByteArray = buffer.array().clone()
 }
 
-class ByteArraySimpleReader(private val buffer: ByteBuffer) : SimpleReader {
-    constructor(array: ByteArray) : this(ByteBuffer.wrap(array))
+class ByteArraySimpleReader(private val array: ByteArray) : SimpleReader {
+    var index = 0
 
-    override fun readBool(): Boolean = buffer.get().toInt() != 0
-    override fun readByte(): Byte = buffer.get()
-    override fun readShort(): Short = buffer.short
-    override fun readInt(): Int = buffer.int
-    override fun readLong(): Long = buffer.long
+    override fun readBool(): Boolean = array.readByte(index(1)) != 0.toByte()
+    override fun readByte(): Byte = array.readByte(index(1))
+    override fun readShort(): Short = array.readShort(index(2))
+    override fun readInt(): Int = array.readInt(index(4))
+    override fun readLong(): Long = array.readLong(index(8))
 
-    override fun readByteArray(length: Int): ByteArray = ByteArray(length).apply { buffer.get(this) }
+    override fun readByteArray(length: Int): ByteArray {
+        if (length == 0)
+            return ByteArray(0)
+
+        if (length == -1)
+            return ByteArray(array.size - index) { array.readByte(index(1)) }
+
+        return ByteArray(length) { array.readByte(index(1) + it) }
+    }
 
     override fun close() = Unit
 
-    override fun skip(bytes: Int) = buffer.position().let { buffer.position(it + bytes).position() - it }
+    override fun skip(bytes: Int): Int {
+        val max = array.size - index - 1
+        if (max > bytes) {
+            index += bytes
+            return bytes
+        } else {
+            index = array.size - 1
+            return max
+        }
+    }
+
+    override fun hasMore(): Boolean = index < array.size
+
+    private fun index(inc: Int): Int {
+        val current = index
+        index += inc
+        return current
+    }
+
 }

@@ -1,9 +1,11 @@
-package com.yoavst.skaty.protocols.interfaces
+package com.yoavst.skaty.protocols.declarations
+
+import com.yoavst.skaty.serialization.SimpleReader
 
 /**
  * Static extension for the protocol [K].
  */
-interface IProtocolMarker<K : IProtocol<K>> {
+interface IProtocolMarker<K : IProtocol<K>> : IProtocolParser<K> {
     /**
      * Return whether or not [protocol] is [K]
      *
@@ -21,4 +23,6 @@ interface IProtocolMarker<K : IProtocol<K>> {
      * Changing fields inside the defaultValue value has undefined behavior
      */
     val defaultValue: K
+
+    override operator fun invoke(reader: SimpleReader): K = of(reader) ?: throw IllegalArgumentException("reader does not represent $name protocol.")
 }

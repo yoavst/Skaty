@@ -15,10 +15,10 @@ internal fun Uint.toFormattedIpAddress(): String {
 internal fun String.toMacAddress() = BigInteger(replace("-", ""), 16).toUlong()
 
 internal fun Ulong.toFormattedMacAddress(): String {
-    return ((this shr 40).toUbyte().toInt().toString(16) + "-" +
-            (this shr 32).toUbyte().toInt().toString(16) + "-" +
-            (this shr 24).toUbyte().toInt().toString(16) + "-" +
-            (this shr 16).toUbyte().toInt().toString(16) + "-" +
-            (this shr 8).toUbyte().toInt().toString(16) + "-" +
-            (this shr 0).toUbyte().toInt().toString(16)).toUpperCase()
+    return ((this shr 40).toUbyte().toInt().toString(16).padStart(2, '0') + "-" +
+            (this shr 32).toUbyte().toInt().toString(16).padStart(2, '0') + "-" +
+            (this shr 24).toUbyte().toInt().toString(16).padStart(2, '0') + "-" +
+            (this shr 16).toUbyte().toInt().toString(16).padStart(2, '0') + "-" +
+            (this shr 8).toUbyte().toInt().toString(16).padStart(2, '0') + "-" +
+            (this shr 0).toUbyte().toInt().toString(16).padStart(2, '0')).toUpperCase()
 }
