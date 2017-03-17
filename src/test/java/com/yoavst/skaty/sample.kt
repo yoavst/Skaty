@@ -5,14 +5,19 @@ import com.yoavst.skaty.protocols.*
 import com.yoavst.skaty.protocols.TCP.Flag.ACK
 import com.yoavst.skaty.protocols.TCP.Flag.SYN
 import com.yoavst.skaty.serialization.ByteArraySimpleReader
+import com.yoavst.skaty.network.Network
 import unsigned.ub
 import unsigned.ui
 import unsigned.us
 import java.io.File
 
 fun main(args: Array<String>) {
-    ls(TCPOption)
-    lsOption<TCPOption.Timestamp>()
+    Network.init("192.168.1.106")
+
+    Network.sniff(timeout = 3000).filter { TCP in it }.dropRaw().forEach(::println)
+
+    Network.close()
+    println("done")
 }
 
 fun testResourceOf(file: String): File = File("src/test/resources/$file")
@@ -67,13 +72,21 @@ fun showcase() {
     }
 
     // sniff
-    val packets = sniff().filter { TCP in it && it[TCP].dport == 1200.us }.timeout(2000).take(10).map { item -> item[TCP].ack }.toList()
+    val packets = Network.sniff(timeout = 2000).filter { TCP in it && it[TCP].dport == 1200.us }.take(10).map { item -> item[TCP].ack }.toList()
     packets.forEach(::println)
 }
 
 fun sendp(packet: Layer2) {}
 fun send(packet: Layer3) {}
 fun sr1(packet: Layer3, timeout: Long = 1000): IProtocol<*>? = packet as IProtocol<*>
-fun sniff(): Sequence<IProtocol<*>> = emptySequence()
-fun <K : IProtocol<*>> Sequence<K>.timeout(timeout: Long): Sequence<K> = this
+fun <K : IProtocol<*>> Sequence<K>.dropRaw(): Sequence<K> = onEach {
+    var last: IProtocol<*>? = it
+    while (last is IContainerProtocol<*>) {
+        if (last.payload is Raw) {
+            last.payload = null
+            break
+        } else
+            last = last.payload
+    }
+}
 

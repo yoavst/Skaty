@@ -28,6 +28,8 @@ dependencies {
     compile 'io.github.microutils:kotlin-logging:1.4.3'
     testCompile "org.slf4j:slf4j-simple:1.7.24"
 
+    compile 'org.pcap4j:pcap4j-core:1.+'
+    compile 'org.pcap4j:pcap4j-packetfactory-static:1.+'
 }
 
 sourceSets {

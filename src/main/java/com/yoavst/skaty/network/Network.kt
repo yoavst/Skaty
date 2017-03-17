@@ -1,0 +1,62 @@
+package com.yoavst.skaty.network
+
+import com.yoavst.skaty.protocols.Ether
+import com.yoavst.skaty.protocols.IProtocol
+import com.yoavst.skaty.protocols.Layer2
+import com.yoavst.skaty.protocols.Raw
+import com.yoavst.skaty.serialization.ByteArraySimpleReader
+import org.pcap4j.core.PcapHandle
+import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode
+import org.pcap4j.core.Pcaps
+import java.io.Closeable
+import java.net.InetAddress
+import java.util.concurrent.atomic.AtomicLong
+import kotlin.concurrent.thread
+
+
+object Network : Closeable {
+    private lateinit var readHandle: PcapHandle
+    private lateinit var sendHandle: PcapHandle
+
+    internal var index: AtomicLong = AtomicLong(0)
+    internal var currentPacket: Pair<IProtocol<*>, Long> = Raw("") to index.get()
+    fun init(ip: String) {
+        val nif = Pcaps.getDevByAddress(InetAddress.getByName(ip))
+        sendHandle = nif.openLive(65536, PromiscuousMode.NONPROMISCUOUS, 0)
+        Runtime.getRuntime().addShutdownHook(Thread {
+            close()
+        })
+        thread(start = true, isDaemon = false) {
+            readHandle = nif.openLive(65536, PromiscuousMode.NONPROMISCUOUS, 0)
+            while (readHandle.isOpen) {
+                val raw = readHandle.nextRawPacket
+                if (raw != null) {
+                    val packet = Ether.of(ByteArraySimpleReader(raw))
+                    if (packet != null)
+                        currentPacket = packet to index.incrementAndGet()
+                }
+            }
+        }
+    }
+
+    override fun close() {
+        readHandle.close()
+        sendHandle.close()
+    }
+
+    fun sniff(timeout: Long = Long.MAX_VALUE): Sequence<IProtocol<*>> {
+        val startTime: Long = System.currentTimeMillis()
+        var iteratorIndex: Long = index.get()
+        return generateSequence {
+            while (true) {
+                val snifferIndex = index.get()
+                if (snifferIndex > 0 && snifferIndex > iteratorIndex) break
+                else if (System.currentTimeMillis() - startTime >= timeout)
+                    return@generateSequence null
+            }
+            val (packet, newIndex) = currentPacket
+            iteratorIndex = newIndex
+            packet
+        }
+    }
+}
