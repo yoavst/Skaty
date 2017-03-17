@@ -30,6 +30,7 @@ data class Ether(
 
     override fun toString(): String = ToString.generate(this)
     override val marker get() = Companion
+    override fun headerSize(): Int = 14
 
     companion object : IProtocolMarker<Ether>, KLogging() {
         override val name: String get() = "Ethernet"
@@ -37,10 +38,6 @@ data class Ether(
         override val defaultValue: Ether = Ether()
 
         override fun of(reader: SimpleReader, serializationContext: SerializationContext): Ether? = try {
-//            // including Preamble and SFD
-//            reader.readByteArray(7) // preamble
-//            require(reader.readUbyte() == 0xAB.ub) { "Not an ethernet packet" } // SFD
-
             val dst = mac(reader.readByteArray(6))
             val src = mac(reader.readByteArray(6))
 

@@ -25,6 +25,8 @@ data class UDP(var sport: Ushort = 53.us,
     override fun toString(): String = ToString.generate(this)
     override val marker get() = Companion
 
+    override fun headerSize(): Int = 8
+
     companion object : IProtocolMarker<UDP>, KLogging() {
         override val name: String get() = "UDP"
         override fun isProtocol(protocol: IProtocol<*>): Boolean = protocol is UDP

@@ -41,6 +41,14 @@ data class IP(var version: Byte = 4,
     override fun toString(): String = ToString.generate(this)
     override val marker get() = Companion
 
+    override fun headerSize(): Int {
+        val bytes = options.sumBy {
+            val length = it.length.toInt()
+            if (length == 0) 1 else length
+        }
+        return 20 + bytes + (bytes % 4)
+    }
+
     companion object : IProtocolMarker<IP>, KLogging() {
         override val name: String get() = "IP"
         override fun isProtocol(protocol: IProtocol<*>): Boolean = protocol is IP

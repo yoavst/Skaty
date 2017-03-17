@@ -31,6 +31,14 @@ data class TCP(var sport: Ushort? = 20.us,
 
     override val marker get() = Companion
 
+    override fun headerSize(): Int {
+        val bytes = options.sumBy {
+            val length = it.length.toInt()
+            if (length == 0) 1 else length
+        }
+        return 20 + bytes + (bytes % 4)
+    }
+
     companion object : IProtocolMarker<TCP>, KLogging() {
         override val name: String get() = "TCP"
         override fun isProtocol(protocol: IProtocol<*>): Boolean = protocol is TCP
@@ -55,7 +63,7 @@ data class TCP(var sport: Ushort? = 20.us,
             val checksum = reader.readUshort()
             val urgPtr = reader.readUshort()
 
-            var optionsSize = headerLength - 5
+            var optionsSize = (headerLength - 5) * 4
             val options = mutableListOf<TCPOption>()
             while (optionsSize > 0) {
                 val option = TCPOption.of(reader, serializationContext) ?: break

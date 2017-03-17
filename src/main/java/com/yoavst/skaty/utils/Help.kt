@@ -2,6 +2,8 @@ package com.yoavst.skaty.utils
 
 import com.yoavst.skaty.model.Exclude
 import com.yoavst.skaty.protocols.declarations.IProtocolMarker
+import com.yoavst.skaty.protocols.declarations.IProtocolOption
+import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
@@ -26,6 +28,21 @@ object Help : BasePrinter() {
         }
         return ""
     }
+
+    fun optionGenerate(option: KClass<IProtocolOption<*>>): String {
+        val properties = option.declaredMemberProperties.filter { it.findAnnotation<Exclude>() == null && it.name != "payload" && it.name != "marker" }
+        if (properties.isNotEmpty()) {
+            val info = properties.map { it.name to it.returnType.format() }
+            val maxNameLen = info.maxBy { (name, _) -> name.length }!!.first.length + 1
+            val maxTypeLen = info.maxBy { (_, type) -> type.length }!!.second.length + 1
+            return info.joinToString(separator = "\n") { (name, type) ->
+                "${name.padEnd(maxNameLen).colorize(ParameterNameColor)} : ${type.padEnd(maxTypeLen).colorize(FieldColor)}"
+            }
+        }
+        return ""
+    }
+
+
 
     private fun KType.format(): String = toString().cleanTypeName()
 

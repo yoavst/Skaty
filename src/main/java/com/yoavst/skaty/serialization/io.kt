@@ -38,6 +38,11 @@ interface SimpleReader : Closeable {
     fun hasMore(): Boolean
 }
 
+interface EndianSimpleReader : SimpleReader {
+    fun bigEndian()
+    fun littleEndian()
+}
+
 fun SimpleReader.readUbyte() = readByte().ub
 fun SimpleReader.readUshort() = readShort().us
 fun SimpleReader.readUint() = readInt().ui

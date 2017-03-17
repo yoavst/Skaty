@@ -1,10 +1,7 @@
 package com.yoavst.skaty.utils
 
 import com.yoavst.skaty.model.Exclude
-import com.yoavst.skaty.protocols.default
-import com.yoavst.skaty.protocols.declarations.IContainerProtocol
-import com.yoavst.skaty.protocols.declarations.IProtocol
-import kotlin.reflect.full.declaredMemberProperties
+import com.yoavst.skaty.protocols.*
 import kotlin.reflect.full.findAnnotation
 
 object ToString : BasePrinter() {
@@ -13,7 +10,7 @@ object ToString : BasePrinter() {
     var ParameterValueColor: Color = Color.CYAN
 
     fun generate(protocol: IProtocol<*>, builder: StringBuilder = StringBuilder()): String {
-        val properties = protocol::class.declaredMemberProperties.filter { it.findAnnotation<Exclude>() == null && it.name != "payload" && it.name != "marker" }
+        val properties = protocol::class.getFields().filter { it.findAnnotation<Exclude>() == null && it.name != "payload" && it.name != "marker" }
         builder.apply {
             append("<").append(protocol.marker.name.colorize(ProtocolColor)).append(' ')
             for (property in properties) {
@@ -34,6 +31,8 @@ object ToString : BasePrinter() {
         }
         return builder.toString()
     }
+
+
 
     private val hexArray = "0123456789ABCDEF".toCharArray()
     fun toHex(bytes: ByteArray): String {

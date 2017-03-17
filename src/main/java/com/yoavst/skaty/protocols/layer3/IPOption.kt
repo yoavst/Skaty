@@ -5,13 +5,15 @@ package com.yoavst.skaty.protocols
 import com.yoavst.skaty.model.Exclude
 import com.yoavst.skaty.protocols.declarations.IProtocol
 import com.yoavst.skaty.protocols.declarations.IProtocolMarker
+import com.yoavst.skaty.protocols.declarations.IProtocolOption
 import com.yoavst.skaty.serialization.*
 import com.yoavst.skaty.utils.clearLeftBits
 import mu.KLogging
 import unsigned.*
 
 
-sealed class IPOption(val copied: Boolean, val clazz: Class, val number: Byte, val length: Ubyte = 0.ub, @property:Exclude val data: ByteArray? = null) : IProtocol<IPOption> {
+sealed class IPOption(val copied: Boolean, val clazz: Class, val number: Byte, val length: Ubyte = 0.ub, @property:Exclude val data: ByteArray? = null) :
+        IProtocolOption<IPOption> {
     @Exclude val name: String get() = KnownOptions[number] ?: ExtraKnownOptions[number] ?: "$number"
     open fun value(): String = if (length.toInt() in 0..2) "" else String(data!!, Charsets.US_ASCII)
 
@@ -31,10 +33,16 @@ sealed class IPOption(val copied: Boolean, val clazz: Class, val number: Byte, v
 
     override fun toString(): String = name + value().let { if (it.isEmpty()) it else "[$it]" }
 
-    //region Options
-    object EndOfOptions : IPOption(false, Class.Control, 0)
+    override fun headerSize(): Int = 2
 
-    object NOP : IPOption(false, Class.Control, 1)
+    //region Options
+    object EndOfOptions : IPOption(false, Class.Control, 0) {
+        override fun headerSize(): Int = 1
+    }
+
+    object NOP : IPOption(false, Class.Control, 1) {
+        override fun headerSize(): Int = 1
+    }
 
     class Security private constructor(val level: Ushort, val compartments: Ushort, val restrictions: Ushort, val tcc: Int, data: ByteArray) :
             IPOption(true, Class.Control, 2, 11.ub, data) {
@@ -243,7 +251,7 @@ sealed class IPOption(val copied: Boolean, val clazz: Class, val number: Byte, v
                             type.clearLeftBits(3).toByte(), length, data))
                 }
             }
-        }  catch (e: Exception) {
+        } catch (e: Exception) {
             logger.error(e) { "Failed to parse the packet to a IPOption packet." }
             null
         }

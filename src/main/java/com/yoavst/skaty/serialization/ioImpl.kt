@@ -2,6 +2,7 @@ package com.yoavst.skaty.serialization
 
 import java.io.Closeable
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 class ByteArraySimpleWriter(private val buffer: ByteBuffer, private val closing: Closeable? = null) : SimpleWriter {
     constructor(array: ByteArray) : this(ByteBuffer.wrap(array))
@@ -58,10 +59,13 @@ class ByteArraySimpleReader(private val array: ByteArray) : SimpleReader {
         if (length == 0)
             return ByteArray(0)
 
-        if (length == -1)
+        if (length < 0) {
+            if (array.size - index <= 0)
+                return ByteArray(0)
             return ByteArray(array.size - index) { array.readByte(index(1)) }
+        }
 
-        return ByteArray(length) { array.readByte(index(1) + it) }
+        return ByteArray(length) { array.readByte(index(1)) }
     }
 
     override fun close() = Unit
@@ -84,5 +88,37 @@ class ByteArraySimpleReader(private val array: ByteArray) : SimpleReader {
         index += inc
         return current
     }
-
 }
+
+class BufferSimpleReader(private val buffer: ByteBuffer) : EndianSimpleReader {
+    constructor(array: ByteArray) : this(ByteBuffer.wrap(array))
+
+    override fun readBool(): Boolean = buffer.get().toInt() != 0
+    override fun readByte(): Byte = buffer.get()
+    override fun readShort(): Short = buffer.short
+    override fun readInt(): Int = buffer.int
+    override fun readLong(): Long = buffer.long
+
+    override fun readByteArray(length: Int): ByteArray {
+        if (length == -1) {
+            return ByteArray(buffer.remaining()).apply { buffer.get(this) }
+        } else
+            return ByteArray(length).apply { buffer.get(this) }
+
+    }
+
+    override fun close() = Unit
+
+    override fun skip(bytes: Int) = buffer.position().let { buffer.position(it + bytes).position() - it }
+
+    override fun hasMore(): Boolean = buffer.hasRemaining()
+
+    override fun bigEndian() {
+        buffer.order(ByteOrder.BIG_ENDIAN)
+    }
+
+    override fun littleEndian() {
+        buffer.order(ByteOrder.LITTLE_ENDIAN)
+    }
+}
+

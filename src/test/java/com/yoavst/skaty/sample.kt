@@ -2,15 +2,17 @@ package com.yoavst.skaty
 
 import com.yoavst.skaty.model.flagsOf
 import com.yoavst.skaty.protocols.*
-import com.yoavst.skaty.protocols.TCP.Flag.*
+import com.yoavst.skaty.protocols.TCP.Flag.ACK
+import com.yoavst.skaty.protocols.TCP.Flag.SYN
 import com.yoavst.skaty.serialization.ByteArraySimpleReader
-import unsigned.*
+import unsigned.ub
+import unsigned.ui
+import unsigned.us
 import java.io.File
 
 fun main(args: Array<String>) {
-    val data = hexStringToByteArray(testResourceOf("sample.bin").readText())
-    val packet = Ether.of(ByteArraySimpleReader(data))
-    println(packet)
+    ls(TCPOption)
+    lsOption<TCPOption.Timestamp>()
 }
 
 fun testResourceOf(file: String): File = File("src/test/resources/$file")
@@ -24,6 +26,17 @@ fun hexStringToByteArray(s: String): ByteArray {
         i += 2
     }
     return data
+}
+
+fun testReadingPcap() {
+    val sniff = pcapOf(testResourceOf("http.pcap"))
+    println(sniff)
+}
+
+fun testReadingSinglePacket() {
+    val data = hexStringToByteArray(testResourceOf("sample1.bin").readText())
+    val packet = Ether.of(ByteArraySimpleReader(data))
+    println(packet)
 }
 
 fun showcase() {

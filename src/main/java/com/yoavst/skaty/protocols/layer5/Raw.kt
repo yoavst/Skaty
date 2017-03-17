@@ -13,6 +13,9 @@ import com.yoavst.skaty.utils.ToString
 data class Raw(@property:Formatted(Companion::class) var load: String = "") : IProtocol<Raw> {
     override fun toString(): String = ToString.generate(this)
     override val marker get() = Companion
+    override fun headerSize(): Int = 0
+
+    operator fun contains(text: String) = text in load
 
     companion object : IProtocolMarker<Raw>, Formatter<String> {
         override val name: String get() = "Raw"

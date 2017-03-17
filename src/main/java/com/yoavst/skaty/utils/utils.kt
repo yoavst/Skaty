@@ -2,9 +2,11 @@ package com.yoavst.skaty.utils
 
 import unsigned.*
 
-fun Boolean.toInt() = if (this) 1 else 0
-fun Boolean.toByte() = toInt().toByte()
+internal fun Boolean.toInt() = if (this) 1 else 0
+internal fun Boolean.toByte() = toInt().toByte()
 
-fun Ushort.clearLeftBits(count: Int) = (this shl count) shr count
-fun Ubyte.clearLeftBits(count: Int) = (this shl count) shr count
-fun Int.clearLeftBits(count: Int) = (this shl count) ushr count
+internal fun Ushort.clearLeftBits(count: Int) = (this shl count) shr count
+internal fun Ubyte.clearLeftBits(count: Int) = (this shl count) shr count
+internal fun Int.clearLeftBits(count: Int) = (this shl count) ushr count
+
+internal fun String.byteSize() = toByteArray(Charsets.US_ASCII).size

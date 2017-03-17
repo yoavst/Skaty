@@ -5,6 +5,7 @@ package com.yoavst.skaty.protocols
 import com.yoavst.skaty.model.Exclude
 import com.yoavst.skaty.protocols.declarations.IProtocol
 import com.yoavst.skaty.protocols.declarations.IProtocolMarker
+import com.yoavst.skaty.protocols.declarations.IProtocolOption
 import com.yoavst.skaty.serialization.*
 import com.yoavst.skaty.utils.ToString
 import mu.KLogging
@@ -25,7 +26,7 @@ import unsigned.*
  * **Note:** length includes Option-Kind and Option-length in its value.
  *
  */
-sealed class TCPOption(val kind: Ubyte, val length: Ubyte = 0.ub, @property:Exclude val data: ByteArray? = null) : IProtocol<TCPOption> {
+sealed class TCPOption(val kind: Ubyte, val length: Ubyte = 0.ub, val data: ByteArray? = null) : IProtocolOption<TCPOption> {
     @Exclude val name: String get() = KnownOptions[kind] ?: ExtraKnownOptions[kind] ?: "$kind"
     open fun value(): String = if (length.toInt() in 0..2) "" else String(data!!, Charsets.US_ASCII)
 
@@ -43,10 +44,17 @@ sealed class TCPOption(val kind: Ubyte, val length: Ubyte = 0.ub, @property:Excl
 
     override fun toString(): String = name + value().let { if (it.isEmpty()) it else "[$it]" }
 
-    //region Options
-    object EndOfOptions : TCPOption(0.ub)
+    override fun headerSize(): Int = 2
 
-    object NOP : TCPOption(1.ub)
+    //region Options
+    object EndOfOptions : TCPOption(0.ub)  {
+        override fun headerSize(): Int = 1
+    }
+
+    object NOP : TCPOption(1.ub)  {
+        override fun headerSize(): Int = 1
+    }
+
     class MaxSegSize private constructor(val size: Ushort, data: ByteArray) : TCPOption(2.ub, 4.ub, data) {
         constructor(data: ByteArray) : this(data.readUshort(), data)
         constructor(size: Ushort) : this(size, bufferOf(size))
@@ -123,10 +131,10 @@ sealed class TCPOption(val kind: Ubyte, val length: Ubyte = 0.ub, @property:Excl
         }
     }
 
-    class AltChecksumOpt(checksum: ByteArray) : TCPOption(15.ub, checksum.size.ub + 2, checksum) {
-        operator fun component1(): ByteArray = data!!
+    class AltChecksumOpt(val checksum: ByteArray) : TCPOption(15.ub, checksum.size.ub + 2, checksum) {
+        operator fun component1(): ByteArray = checksum
 
-        override fun value(): String = ToString.toHex(data!!)
+        override fun value(): String = ToString.toHex(checksum)
     }
 
     class Mood(val mood: String, data: ByteArray) : TCPOption(25.ub, data.size.ub + 2, data) {

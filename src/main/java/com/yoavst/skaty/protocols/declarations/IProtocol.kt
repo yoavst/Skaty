@@ -8,4 +8,9 @@ interface IProtocol<K : IProtocol<K>> {
      */
     @Exclude
     val marker: IProtocolMarker<K>
+
+    /**
+     * Returns header size in bytes
+     */
+    fun headerSize(): Int
 }
