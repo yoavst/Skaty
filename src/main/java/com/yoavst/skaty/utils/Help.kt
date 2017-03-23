@@ -17,7 +17,7 @@ object Help : BasePrinter() {
 
     fun generate(protocol: IProtocolMarker<*>): String {
         val defaultValue = protocol.defaultValue
-        val properties = defaultValue::class.memberProperties.filter { it.findAnnotation<Exclude>() == null && it.name != "payload" && it.name != "marker" }
+        val properties = defaultValue::class.memberProperties.filter { it.findAnnotation<Exclude>() == null && it.name !in ExcludedNames}
         if (properties.isNotEmpty()) {
             val info = properties.map { Triple(it.name, it.returnType.format(), it.getFormatter().format(it.getter.call(defaultValue))) }
             val maxNameLen = info.maxBy { (name, _, _) -> name.length }!!.first.length + 1
@@ -30,7 +30,7 @@ object Help : BasePrinter() {
     }
 
     fun optionGenerate(option: KClass<IProtocolOption<*>>): String {
-        val properties = option.declaredMemberProperties.filter { it.findAnnotation<Exclude>() == null && it.name != "payload" && it.name != "marker" }
+        val properties = option.declaredMemberProperties.filter { it.findAnnotation<Exclude>() == null && it.name !in ExcludedNames }
         if (properties.isNotEmpty()) {
             val info = properties.map { it.name to it.returnType.format() }
             val maxNameLen = info.maxBy { (name, _) -> name.length }!!.first.length + 1

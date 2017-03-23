@@ -25,14 +25,12 @@ data class IP(var version: Byte = 4,
               var src: Address? = null,
               var dst: Address = ip("127.0.0.1"),
               var options: Options<IPOption> = emptyOptions(),
-              @property:Exclude private var _payload: IProtocol<*>? = null) : BaseProtocol<IP>(), Ether.Aware, Layer3 {
+              override var _payload: IProtocol<*>? = null,
+              override var parent: IProtocol<*>? = null) : BaseProtocol<IP>(), Ether.Aware, Layer3 {
 
-    override var payload: IProtocol<*>?
-        get() = _payload
-        set(value) {
-            _payload = value
-            (value as? Aware)?.onPayload(this)
-        }
+    override fun onPayload() {
+        (payload as? Aware)?.onPayload(this)
+    }
 
     override fun onPayload(ether: Ether) {
         ether.type = Ether.Type.IP
@@ -91,7 +89,7 @@ data class IP(var version: Byte = 4,
 
             val ip = IP(version, ihl, tos, ecn, length, id, Flags(flags.toSet()), ttl, proto, chksum, src,
                     dst, Options(options))
-            ip._payload = serializationContext.serialize(reader, ip)
+            ip._payload = serializationContext.deserialize(reader, ip)
 
             ip
         } catch (e: Exception) {

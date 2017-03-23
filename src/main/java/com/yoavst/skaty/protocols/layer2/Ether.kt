@@ -2,31 +2,31 @@
 
 package com.yoavst.skaty.protocols
 
-import com.yoavst.skaty.model.Exclude
 import com.yoavst.skaty.model.Formatted
 import com.yoavst.skaty.model.Formatter
 import com.yoavst.skaty.protocols.declarations.IProtocol
 import com.yoavst.skaty.protocols.declarations.IProtocolMarker
 import com.yoavst.skaty.protocols.declarations.Layer2
-import com.yoavst.skaty.serialization.*
+import com.yoavst.skaty.serialization.SerializationContext
+import com.yoavst.skaty.serialization.SimpleReader
+import com.yoavst.skaty.serialization.bufferOf
+import com.yoavst.skaty.serialization.readUshort
 import com.yoavst.skaty.utils.ToString
 import mu.KLogging
 import unsigned.Ulong
 import unsigned.Ushort
-import unsigned.ub
 import unsigned.us
 
 data class Ether(
         var dst: MAC? = null,
         var src: MAC? = null,
         @property:Formatted(Type::class) var type: Ushort = 0.us,
-        @property:Exclude private var _payload: IProtocol<*>? = null) : BaseProtocol<Ether>(), Layer2 {
-    override var payload: IProtocol<*>?
-        get() = _payload
-        set(value) {
-            _payload = value
-            (value as? Aware)?.onPayload(this)
-        }
+        override var _payload: IProtocol<*>? = null,
+        override var parent: IProtocol<*>? = null) : BaseProtocol<Ether>(), Layer2 {
+
+    override fun onPayload() {
+        (payload as? Aware)?.onPayload(this)
+    }
 
     override fun toString(): String = ToString.generate(this)
     override val marker get() = Companion
@@ -44,7 +44,7 @@ data class Ether(
             val etherType = reader.readUshort()
 
             val ether = Ether(dst, src, etherType)
-            ether._payload = serializationContext.serialize(reader, ether)
+            ether._payload = serializationContext.deserialize(reader, ether)
 
             ether
         } catch (e: Exception) {

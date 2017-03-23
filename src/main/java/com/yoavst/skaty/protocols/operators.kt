@@ -16,7 +16,7 @@ operator fun <K : IContainerProtocol<*>> K.div(protocol: IProtocol<*>): K {
     return this
 }
 
-operator fun <K : IContainerProtocol<*>> K.div(load: String): K = div(Raw(load))
+operator fun <K : IContainerProtocol<*>> K.div(load: String): K = div(Raw(load.toByteArray()))
 operator fun IProtocol<*>?.contains(protocol: IProtocolMarker<*>): Boolean {
     if (this == null) return false
     if (protocol.isProtocol(this)) return true

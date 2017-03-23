@@ -12,7 +12,7 @@ import unsigned.us
 import java.io.File
 
 fun main(args: Array<String>) {
-    Network.init("192.168.1.106")
+    Network.init("192.168.1.109")
 
     Network.sniff(timeout = 3000).filter { TCP in it }.dropRaw().forEach(::println)
 
@@ -34,7 +34,7 @@ fun hexStringToByteArray(s: String): ByteArray {
 }
 
 fun testReadingPcap() {
-    val sniff = pcapOf(testResourceOf("http.pcap"))
+    val sniff = pcapOf(testResourceOf("sample.pcap"))
     println(sniff)
 }
 

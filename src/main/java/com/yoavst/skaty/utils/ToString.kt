@@ -10,7 +10,7 @@ object ToString : BasePrinter() {
     var ParameterValueColor: Color = Color.CYAN
 
     fun generate(protocol: IProtocol<*>, builder: StringBuilder = StringBuilder()): String {
-        val properties = protocol::class.getFields().filter { it.findAnnotation<Exclude>() == null && it.name != "payload" && it.name != "marker" }
+        val properties = protocol::class.getFields().filter { it.findAnnotation<Exclude>() == null && it.name !in ExcludedNames }
         builder.apply {
             append("<").append(protocol.marker.name.colorize(ProtocolColor)).append(' ')
             for (property in properties) {

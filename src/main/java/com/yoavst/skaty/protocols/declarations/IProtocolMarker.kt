@@ -1,11 +1,13 @@
 package com.yoavst.skaty.protocols.declarations
 
+import com.yoavst.skaty.serialization.DefaultSerializationEnvironment
+import com.yoavst.skaty.serialization.SerializationContext
 import com.yoavst.skaty.serialization.SimpleReader
 
 /**
  * Static extension for the protocol [K].
  */
-interface IProtocolMarker<K : IProtocol<K>> : IProtocolParser<K> {
+interface IProtocolMarker<K : IProtocol<K>> {
     /**
      * Return whether or not [protocol] is [K]
      *
@@ -24,5 +26,10 @@ interface IProtocolMarker<K : IProtocol<K>> : IProtocolParser<K> {
      */
     val defaultValue: K
 
-    override operator fun invoke(reader: SimpleReader): K = of(reader) ?: throw IllegalArgumentException("reader does not represent $name protocol.")
+    /**
+     * Try to parse the data into the protocol [K]
+     */
+    fun of(reader: SimpleReader, serializationContext: SerializationContext = DefaultSerializationEnvironment): K?
+
+    operator fun invoke(reader: SimpleReader): K = of(reader) ?: throw IllegalArgumentException("reader does not represent $name protocol.")
 }

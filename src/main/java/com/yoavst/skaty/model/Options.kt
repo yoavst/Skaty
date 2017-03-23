@@ -2,7 +2,7 @@ package com.yoavst.skaty.model
 
 import com.yoavst.skaty.protocols.declarations.IProtocol
 
-class Options<Option : IProtocol<Option>>(private val data: List<Option>) : List<Option> by data {
+class Options<Option : IProtocol<Option>>(private val data: MutableList<Option>) : MutableList<Option> by data {
     @Suppress("UNCHECKED_CAST")
     override fun toString(): String {
         if (isEmpty()) return "[]"
@@ -23,8 +23,12 @@ class Options<Option : IProtocol<Option>>(private val data: List<Option>) : List
 
     override fun hashCode(): Int = fold(1) { total, item -> 31 * total + (item.hashCode()) }
 
+    operator fun plusAssign(option: Option) {
+        data += option
+    }
+
     companion object {
-        fun <K : IProtocol<K>> of(vararg options: K) = Options(options.toList())
+        fun <K : IProtocol<K>> of(vararg options: K) = Options(options.toMutableList())
         fun <K : IProtocol<K>> empty() = of<K>()
 
     }

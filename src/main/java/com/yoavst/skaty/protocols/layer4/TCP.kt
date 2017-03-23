@@ -7,12 +7,14 @@ import com.yoavst.skaty.protocols.declarations.IProtocol
 import com.yoavst.skaty.protocols.declarations.IProtocolMarker
 import com.yoavst.skaty.protocols.declarations.Layer4
 import com.yoavst.skaty.serialization.*
+import com.yoavst.skaty.serialization.SerializationContext.Stage
 import com.yoavst.skaty.utils.ToString
+import com.yoavst.skaty.utils.clearLeftBits
 import mu.KLogging
 import unsigned.*
 
-data class TCP(var sport: Ushort? = 20.us,
-               var dport: Ushort? = 80.us,
+data class TCP(var sport: Ushort = 20.us,
+               var dport: Ushort = 80.us,
                var seq: Uint = 0.ui,
                var ack: Uint = 0.ui,
                var dataofs: Byte? = null,
@@ -21,10 +23,60 @@ data class TCP(var sport: Ushort? = 20.us,
                var window: Ushort = 8192.us,
                @property:Formatted(UshortHexFormatter::class) var chksum: Ushort? = null,
                var urgptr: Ushort = 0.us,
-               var options: Options<TCPOption> = emptyOptions(),
-               override var payload: IProtocol<*>? = null) : BaseProtocol<TCP>(), IP.Aware, Layer4 {
+               val options: Options<TCPOption> = emptyOptions(),
+               override var _payload: IProtocol<*>? = null,
+               override var parent: IProtocol<*>? = null) : BaseProtocol<TCP>(), IP.Aware, Layer4 {
+
     override fun onPayload(ip: IP) {
         ip.proto = IP.Protocol.TCP
+    }
+
+    override fun write(writer: SimpleWriter, stage: Stage) {
+        when (stage) {
+            Stage.Data -> {
+                writer.writeUshort(sport)
+                writer.writeUshort(dport)
+                writer.writeUint(seq)
+                writer.writeUint(ack)
+                writer.writeUbyte(reserved.ub.clearLeftBits(5).shl(1) or (if (Flag.NS in flags) 1 else 0))
+                writer.writeByte(Flag.values().filter { it in flags && it != Flag.NS }.map(Flag::value).fold(0, Int::or).toUByte())
+                writer.writeUshort(window)
+                writer.writeShort(0)
+                writer.writeUshort(urgptr)
+
+                var size = 0
+                var current = writer.index
+                options.forEach {
+                    it.write(writer, stage)
+                    size += writer.index - current
+                    current = writer.index
+                }
+                while (size % 4 != 0) {
+                    options += TCPOption.NOP
+                    TCPOption.NOP.write(writer, Stage.Data)
+                    size += 1
+                }
+
+            }
+            Stage.Length -> {
+                val startingIndex = writer.index
+                var totalSize = 20
+                writer.skip(20)
+                var current = writer.index
+                for (option in options) {
+                    option.write(writer, stage)
+                    totalSize += writer.index - current
+                    current = writer.index
+                }
+                writer.index = startingIndex
+                writer.skip(16)
+                writer.writeUbyte(reserved.ub.clearLeftBits(5).shl(1) or (if (Flag.NS in flags) 1 else 0) or (totalSize / 4).shl(4))
+                writer.index = startingIndex + totalSize
+            }
+            Stage.Checksum -> {
+                //FIXME
+            }
+        }
     }
 
     override fun toString(): String = ToString.generate(this)
@@ -78,7 +130,7 @@ data class TCP(var sport: Ushort? = 20.us,
 
             val tcp = TCP(sport, dport, seq, ack, headerLength, reserved, Flags(flags.toSet()), windowsSize, checksum,
                     urgPtr, Options(options))
-            tcp.payload = serializationContext.serialize(reader, tcp)
+            tcp.payload = serializationContext.deserialize(reader, tcp)
 
             tcp
         } catch (e: Exception) {

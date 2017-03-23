@@ -2,7 +2,6 @@ package com.yoavst.skaty.network
 
 import com.yoavst.skaty.protocols.Ether
 import com.yoavst.skaty.protocols.IProtocol
-import com.yoavst.skaty.protocols.Layer2
 import com.yoavst.skaty.protocols.Raw
 import com.yoavst.skaty.serialization.ByteArraySimpleReader
 import org.pcap4j.core.PcapHandle
@@ -19,7 +18,7 @@ object Network : Closeable {
     private lateinit var sendHandle: PcapHandle
 
     internal var index: AtomicLong = AtomicLong(0)
-    internal var currentPacket: Pair<IProtocol<*>, Long> = Raw("") to index.get()
+    internal var currentPacket: Pair<IProtocol<*>, Long> = Raw(ByteArray(0)) to index.get()
     fun init(ip: String) {
         val nif = Pcaps.getDevByAddress(InetAddress.getByName(ip))
         sendHandle = nif.openLive(65536, PromiscuousMode.NONPROMISCUOUS, 0)

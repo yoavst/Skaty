@@ -8,5 +8,3 @@ internal fun Boolean.toByte() = toInt().toByte()
 internal fun Ushort.clearLeftBits(count: Int) = (this shl count) shr count
 internal fun Ubyte.clearLeftBits(count: Int) = (this shl count) shr count
 internal fun Int.clearLeftBits(count: Int) = (this shl count) ushr count
-
-internal fun String.byteSize() = toByteArray(Charsets.US_ASCII).size

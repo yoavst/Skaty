@@ -7,6 +7,7 @@ import java.nio.charset.Charset
 interface SimpleWriter : Closeable {
     val size: Int
     var index: Int
+    val maxIndex: Int
 
     fun writeBool(value: Boolean)
     fun writeByte(value: Byte)
@@ -22,7 +23,17 @@ fun SimpleWriter.writeUbyte(value: Ubyte) = writeByte(value.toByte())
 fun SimpleWriter.writeUshort(value: Ushort) = writeShort(value.toShort())
 fun SimpleWriter.writeUint(value: Uint) = writeInt(value.toInt())
 fun SimpleWriter.writeUlong(value: Ulong) = writeLong(value.toLong())
-fun SimpleWriter.writeString(value: String, charset: Charset) = writeByteArray(value.toByteArray(charset))
+fun SimpleWriter.writeString(value: String, charset: Charset = Charsets.UTF_8) = writeByteArray(value.toByteArray(charset))
+fun SimpleWriter.skip(bytes: Int): Int {
+    if (bytes + index >= size) {
+        val d = size - index - 1
+        index = size - 1
+        return d
+    }
+
+    index += bytes
+    return bytes
+}
 
 interface SimpleReader : Closeable {
     fun readBool(): Boolean
@@ -34,6 +45,7 @@ interface SimpleReader : Closeable {
      * if [length] == -1, read all the buffer
      */
     fun readByteArray(length: Int): ByteArray
+
     fun skip(bytes: Int): Int
     fun hasMore(): Boolean
 }

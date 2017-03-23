@@ -12,38 +12,55 @@ class ByteArraySimpleWriter(private val buffer: ByteBuffer, private val closing:
         get() = buffer.position()
         set(value) {
             buffer.position(value)
+            updateMax()
         }
+
+    override var maxIndex: Int = 0
+        private set
 
     override fun writeBool(value: Boolean) {
         buffer.put(if (value) 0.toByte() else 1.toByte())
+        updateMax()
     }
 
     override fun writeByte(value: Byte) {
         buffer.put(value)
+        updateMax()
     }
 
     override fun writeShort(value: Short) {
         buffer.putShort(value)
+        updateMax()
     }
 
     override fun writeInt(value: Int) {
         buffer.putInt(value)
+        updateMax()
     }
 
     override fun writeLong(value: Long) {
         buffer.putLong(value)
+        updateMax()
     }
 
     override fun writeByteArray(value: ByteArray, offset: Int, length: Int) {
-        if (length == -1)
+        if (length == -1) {
             buffer.put(value)
-        else
+            updateMax()
+        } else {
             buffer.put(value, offset, length)
+            updateMax()
+        }
     }
 
     override fun close() = closing?.close() ?: Unit
 
     override fun array(): ByteArray = buffer.array().clone()
+
+    private fun updateMax() {
+        if (buffer.position() > maxIndex)
+            maxIndex = buffer.position()
+    }
 }
 
 class ByteArraySimpleReader(private val array: ByteArray) : SimpleReader {

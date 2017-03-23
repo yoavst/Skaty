@@ -3,6 +3,8 @@ package com.yoavst.skaty.utils
 import com.yoavst.skaty.model.Formatted
 import com.yoavst.skaty.model.Formatter
 import com.yoavst.skaty.model.formatter
+import com.yoavst.skaty.protocols.BaseProtocol
+import com.yoavst.skaty.protocols.declarations.IContainerProtocol
 import com.yoavst.skaty.protocols.declarations.IProtocol
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
@@ -28,4 +30,11 @@ open class BasePrinter {
         if (this == Any::class) return emptyList()
         return declaredMemberProperties + supertypes.flatMap { it.jvmErasure.getFields() }
     }
+
+    protected val ExcludedNames = arrayOf(
+            IContainerProtocol<*>::payload.name,
+            "_payload",
+            IProtocol<*>::marker.name,
+            IProtocol<*>::parent.name
+    )
 }
