@@ -31,7 +31,7 @@ fun showcase() {
     sendp(packet)
     
     // sniff packets
-    val packets = Network.sniff(timeout = 2000).filter { TCP in it && it[TCP].dport == 1200.us }.take(10).map { item -> item[TCP].ack }.toList()
+    val packets = sniff(timeout = 2000).filter { TCP in it && it[TCP].dport == 1200.us }.take(10).map { item -> item[TCP].ack }.toList()
     packets.forEach(::println)
 }
 ```
@@ -40,7 +40,7 @@ fun showcase() {
 Currently, in order to initialize the library, you have to call `Network.init(String)` with the IP address of the network interface.
 
 ```kotlin
-Network.init("192.168.1.5")
+init("192.168.1.5")
 ```
 
 This call will make a daemon process. In order to close it, use `Network.close()`.
