@@ -1,9 +1,6 @@
 package com.yoavst.skaty.network
 
-import com.yoavst.skaty.protocols.Ether
-import com.yoavst.skaty.protocols.IProtocol
-import com.yoavst.skaty.protocols.Raw
-import com.yoavst.skaty.protocols.mac
+import com.yoavst.skaty.protocols.*
 import com.yoavst.skaty.serialization.ByteArraySimpleReader
 import org.pcap4j.core.PcapHandle
 import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode
@@ -26,6 +23,9 @@ object Network : Closeable {
 
     val macAddress: Ether.MAC
         get() = mac(NetworkInterface.getByInetAddress(address).hardwareAddress)
+
+    val ipAddress: IP.Address
+        get() = ip(address.address)
 
     fun init(ip: String) {
         address = InetAddress.getByName(ip)

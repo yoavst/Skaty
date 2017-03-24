@@ -27,7 +27,9 @@ data class TCP(var sport: Ushort = 20.us,
                override var _payload: IProtocol<*>? = null,
                override var parent: IProtocol<*>? = null) : BaseProtocol<TCP>(), IP.Aware, Layer4 {
 
-    init { onPayload() }
+    init {
+        onPayload()
+    }
 
     override fun onPayload(ip: IP) {
         ip.proto = IP.Protocol.TCP
@@ -69,8 +71,29 @@ data class TCP(var sport: Ushort = 20.us,
                 dataofs = (totalSize / 4).toUByte()
             }
             Stage.Checksum -> {
-                //FIXME
-                writer.index -= headerSize()
+                val parent = parent
+                if (parent !is IP) {
+                    // Checksum is not supported
+                    writer.index -= headerSize()
+                } else {
+                    val len = (parent.len!! - parent.headerSize()).toInt()
+                    val array = ByteArray(12 + len)
+                    val w = ByteArraySimpleWriter(array)
+                    w.writeByteArray(parent.src!!.toByteArray())
+                    w.writeByteArray(parent.dst.toByteArray())
+                    w.writeByte(0)
+                    w.writeUbyte(parent.proto)
+                    w.writeUshort(len.us)
+                    write(w, Stage.Data)
+                    w.index -= headerSize()
+                    write(w, Stage.Length)
+                    w.writeByteArray(payload?.toByteArray() ?: ByteArray(0))
+
+                    writer.index -= 4 + optionsSize()
+                    chksum = calcChecksum(array).us
+                    writer.writeUshort(chksum!!)
+                    writer.index -= 18
+                }
             }
         }
     }
@@ -80,11 +103,13 @@ data class TCP(var sport: Ushort = 20.us,
     override val marker get() = Companion
 
     override fun headerSize(): Int {
-        val bytes = options.sumBy {
-            val length = it.length.toInt()
-            if (length == 0) 1 else length
-        }
+        val bytes = optionsSize()
         return 20 + bytes + (bytes % 4)
+    }
+
+    private fun optionsSize() = options.sumBy {
+        val length = it.length.toInt()
+        if (length == 0) 1 else length
     }
 
     companion object : IProtocolMarker<TCP>, KLogging() {

@@ -50,3 +50,8 @@ internal fun calcChecksum(data: ByteArray): Short {
 
     return sum.inv().toShort()
 }
+
+/**
+ * If it ever goes out of POC, should be removed
+ */
+inline internal fun unsafe(code: () -> Unit) = code()

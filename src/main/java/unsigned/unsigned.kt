@@ -26,7 +26,7 @@ fun Char.toUshort() = Ushort(toShort())
 fun Long.toUBigInt() = if (this < 0) BigInteger.valueOf(this) + Ulong.MAX_VALUE + BigInteger.ONE else BigInteger.valueOf(this)
 
 
-data class Ubyte(var v: Byte = 0) : Number() {
+data class Ubyte(internal var v: Byte = 0) : Number() {
     override fun toString(): String = toShort().toString()
     companion object {
         /**
@@ -111,7 +111,7 @@ data class Ubyte(var v: Byte = 0) : Number() {
     operator fun compareTo(b: Int) = Integer.compareUnsigned(toInt(), b)
 }
 
-data class Uint(var v: Int = 0) : Number() {
+data class Uint(internal var v: Int = 0) : Number() {
     override fun toString(): String = toLong().toString()
     companion object {
         /**
@@ -185,7 +185,7 @@ data class Uint(var v: Int = 0) : Number() {
     // TODO long
 }
 
-data class Ulong(var v: Long = 0) : Number(), Comparable<Ulong> {
+data class Ulong(internal var v: Long = 0) : Number(), Comparable<Ulong> {
     override fun toString(): String = toBigInt().toString()
     companion object {
         /**
@@ -274,7 +274,7 @@ data class Ulong(var v: Long = 0) : Number(), Comparable<Ulong> {
     }
 }
 
-data class Ushort(var v: Short = 0) : Number() {
+data class Ushort(internal var v: Short = 0) : Number() {
     override fun toString(): String = toInt().toString()
     companion object {
         /**

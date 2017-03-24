@@ -2,6 +2,7 @@
 
 package com.yoavst.skaty.protocols
 
+import com.sun.xml.internal.ws.api.message.Packet
 import com.yoavst.skaty.model.Formatted
 import com.yoavst.skaty.model.UshortHexFormatter
 import com.yoavst.skaty.protocols.declarations.IProtocol
@@ -11,7 +12,12 @@ import com.yoavst.skaty.serialization.*
 import com.yoavst.skaty.serialization.SerializationContext.Stage
 import com.yoavst.skaty.utils.ToString
 import mu.KLogging
+import org.pcap4j.packet.SimpleBuilder
+import org.pcap4j.packet.UdpPacket
+import org.pcap4j.packet.UnknownPacket
+import org.pcap4j.packet.namednumber.UdpPort
 import unsigned.Ushort
+import unsigned.toUshort
 import unsigned.us
 
 data class UDP(var sport: Ushort = 53.us,
@@ -36,16 +42,32 @@ data class UDP(var sport: Ushort = 53.us,
                 writer.writeUshort(0.us)
             }
             Stage.Length -> {
-                len = (writer.maxIndex - writer.index - 1).us
+                len = (writer.maxIndex - writer.index).us
                 writer.skip(4)
                 writer.writeUshort(len!!)
                 writer.skip(2)
             }
             Stage.Checksum -> {
+                val parent = parent
                 if (parent !is IP) {
                     // Checksum is not supported
                     writer.index -= headerSize()
                 } else {
+                    val array = ByteArray(12 + len!!.toInt())
+                    val w = ByteArraySimpleWriter(array)
+                    w.writeByteArray(parent.src!!.toByteArray())
+                    w.writeByteArray(parent.dst.toByteArray())
+                    w.writeByte(0)
+                    w.writeUbyte(parent.proto)
+                    w.writeUshort(len!!)
+                    write(w, Stage.Data)
+                    w.index -= headerSize()
+                    write(w, Stage.Length)
+                    w.writeByteArray(payload?.toByteArray() ?: ByteArray(0))
+
+                    writer.index -= 2
+                    chksum = calcChecksum(array).us
+                    writer.writeUshort(chksum!!)
                     writer.index -= headerSize()
                 }
             }

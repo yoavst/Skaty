@@ -3,6 +3,7 @@
 package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.model.*
+import com.yoavst.skaty.network.Network
 import com.yoavst.skaty.protocols.declarations.IProtocol
 import com.yoavst.skaty.protocols.declarations.IProtocolMarker
 import com.yoavst.skaty.protocols.declarations.Layer3
@@ -12,6 +13,8 @@ import com.yoavst.skaty.utils.ToString
 import com.yoavst.skaty.utils.clearLeftBits
 import mu.KLogging
 import unsigned.*
+import java.net.Inet4Address
+import java.net.InetAddress
 
 data class IP(var version: Byte = 4,
               var ihl: Byte? = null,
@@ -61,7 +64,9 @@ data class IP(var version: Byte = 4,
                 writer.writeUbyte(ttl)
                 writer.writeUbyte(proto)
                 writer.writeShort(0)
-                writer.writeByteArray((src ?: ip("127.0.0.1")).toByteArray()) //fixme
+                if (src == null)
+                    src = Network.ipAddress
+                writer.writeByteArray((src!!).toByteArray())
                 writer.writeByteArray(dst.toByteArray())
                 var size = 0
                 var current = writer.index
@@ -79,7 +84,7 @@ data class IP(var version: Byte = 4,
             Stage.Length -> {
                 val startingIndex = writer.index
                 val totalSize = headerSize()
-                len = (writer.maxIndex - writer.index - 1).us
+                len = (writer.maxIndex - writer.index).us
                 writer.skip(2)
                 writer.writeUshort(len!!)
                 writer.index = startingIndex
@@ -89,6 +94,11 @@ data class IP(var version: Byte = 4,
             }
             Stage.Checksum -> {
                 writer.index -= headerSize()
+                val array = writer.array().copyOfRange(writer.index, writer.index + headerSize())
+                writer.skip(10)
+                chksum = calcChecksum(array).us
+                writer.writeUshort(chksum!!)
+                writer.index -= 12
             }
         }
     }
@@ -170,6 +180,8 @@ data class IP(var version: Byte = 4,
         override fun toString(): String = raw.toFormattedIpAddress()
 
         fun toByteArray() = bufferOf(raw)
+
+        fun toInetAddress(): InetAddress = Inet4Address.getByAddress(toByteArray())
     }
 
     object Protocol : Formatter<Ubyte> {

@@ -6,6 +6,7 @@ import com.yoavst.skaty.protocols.TCP.Flag.ACK
 import com.yoavst.skaty.protocols.TCP.Flag.SYN
 import com.yoavst.skaty.serialization.ByteArraySimpleReader
 import com.yoavst.skaty.network.Network
+import org.pcap4j.packet.UdpPacket
 import unsigned.ub
 import unsigned.ui
 import unsigned.us
@@ -22,7 +23,6 @@ fun main(args: Array<String>) {
     File("results.bin").writeBytes(raw)
     val p = Ether.of(ByteArraySimpleReader(File("results.bin").readBytes()))
     println(p)
-
 
 //    Network.sniff(timeout = 3000).filter { TCP in it }.dropRaw().forEach(::println)
 //
