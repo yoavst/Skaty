@@ -6,6 +6,7 @@ import com.yoavst.skaty.protocols.TCP.Flag.ACK
 import com.yoavst.skaty.protocols.TCP.Flag.SYN
 import com.yoavst.skaty.serialization.ByteArraySimpleReader
 import com.yoavst.skaty.network.Network
+import com.yoavst.skaty.network.Network.send
 import com.yoavst.skaty.network.Network.sendp
 import org.pcap4j.packet.UdpPacket
 import unsigned.ub
@@ -24,12 +25,8 @@ fun main(args: Array<String>) {
 }
 
 fun testSending() {
-    val packet = Ether() /
-            IP(dst = ip("192.168.1.1"), tos = 53.ub, options = optionsOf(IPOption.MTUProb(22.us))) /
-            UDP(sport = 7000.us, dport = 7000.us) /
-            "Hello world"
-
-    sendp(packet)
+    val packet = IP(dst = ip("192.168.1.1"), options = optionsOf(IPOption.MTUProb(22.us))) / UDP(sport = 7000.us, dport = 7000.us) / "Hello world"
+    send(packet)
 }
 
 fun testSerializing() {

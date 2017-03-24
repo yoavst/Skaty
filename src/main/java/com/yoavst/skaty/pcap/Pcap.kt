@@ -40,6 +40,8 @@ data class Pcap(var major: Ushort = 2.us, var minor: Ushort = 4.us, var thisZone
         throw IllegalStateException("Should not call this method on pcap file")
     }
 
+    operator fun iterator(): Iterator<PcapPacket> = packets.iterator()
+
     companion object : IProtocolMarker<Pcap>, KLogging() {
         override val name: String = "Pcap file"
         override fun isProtocol(protocol: IProtocol<*>): Boolean = protocol is Pcap

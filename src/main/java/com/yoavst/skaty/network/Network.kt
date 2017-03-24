@@ -71,4 +71,8 @@ object Network : Closeable {
     fun sendp(packet: Ether) {
         sendHandle.sendPacket(packet.toByteArray())
     }
+
+    fun send(packet: IP) {
+        sendHandle.sendPacket((Ether() / packet).toByteArray())
+    }
 }

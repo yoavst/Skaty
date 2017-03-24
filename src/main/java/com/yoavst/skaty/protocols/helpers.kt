@@ -6,6 +6,7 @@ import com.yoavst.skaty.model.Options
 import com.yoavst.skaty.pcap.Pcap
 import com.yoavst.skaty.serialization.*
 import java.io.File
+import java.net.InetAddress
 import kotlin.reflect.KClass
 import com.yoavst.skaty.protocols.declarations.IProtocol as OrgIProtocol
 import com.yoavst.skaty.protocols.declarations.IProtocolOption as OrgIProtocolOption
@@ -32,6 +33,10 @@ fun ip(address: String): IP.Address {
 
 fun ip(address: ByteArray) : IP.Address {
     return IP.Address(address.readUint())
+}
+
+fun ip(address: InetAddress): IP.Address {
+    return ip(address.address)
 }
 
 fun pcapOf(path: String): Pcap? = pcapOf(File(path))
