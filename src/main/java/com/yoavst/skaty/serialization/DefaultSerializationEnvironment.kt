@@ -55,7 +55,7 @@ object DefaultSerializationEnvironment : SerializationContext {
     override fun serialize(protocol: IProtocol<*>, writer: SimpleWriter, stage: Stage) {
         if (stage == Stage.Checksum) {
             if (protocol is IContainerProtocol<*>)
-                serialize(protocol, writer, stage)
+                protocol.payload?.let { serialize(it, writer, stage) }
             protocol.write(writer, stage)
         } else {
             @Suppress("NAME_SHADOWING")

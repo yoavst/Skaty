@@ -27,6 +27,8 @@ data class TCP(var sport: Ushort = 20.us,
                override var _payload: IProtocol<*>? = null,
                override var parent: IProtocol<*>? = null) : BaseProtocol<TCP>(), IP.Aware, Layer4 {
 
+    init { onPayload() }
+
     override fun onPayload(ip: IP) {
         ip.proto = IP.Protocol.TCP
     }
@@ -61,7 +63,7 @@ data class TCP(var sport: Ushort = 20.us,
             Stage.Length -> {
                 val startingIndex = writer.index
                 val totalSize = headerSize()
-                writer.skip(16)
+                writer.skip(12)
                 writer.writeUbyte(reserved.ub.clearLeftBits(5).shl(1) or (if (Flag.NS in flags) 1 else 0) or (totalSize / 4).shl(4))
                 writer.index = startingIndex + totalSize
                 dataofs = (totalSize / 4).toUByte()

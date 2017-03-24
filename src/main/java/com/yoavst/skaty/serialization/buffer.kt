@@ -37,7 +37,7 @@ fun bufferOf(vararg shorts: Ushort): ByteArray {
 }
 
 fun bufferOf(vararg longs: Ulong): ByteArray {
-    val buffer = ByteBuffer.allocate(longs.size * 4)
+    val buffer = ByteBuffer.allocate(longs.size * 8)
     longs.forEach { buffer.putLong(it.toLong()) }
     return buffer.array()
 }

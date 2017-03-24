@@ -20,6 +20,9 @@ data class UDP(var sport: Ushort = 53.us,
                @property:Formatted(UshortHexFormatter::class) var chksum: Ushort? = null,
                override var _payload: IProtocol<*>? = null,
                override var parent: IProtocol<*>? = null) : BaseProtocol<UDP>(), IP.Aware, Layer4 {
+
+    init { onPayload() }
+
     override fun onPayload(ip: IP) {
         ip.proto = IP.Protocol.UDP
     }

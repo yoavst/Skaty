@@ -24,6 +24,8 @@ data class Ether(
         override var _payload: IProtocol<*>? = null,
         override var parent: IProtocol<*>? = null) : BaseProtocol<Ether>(), Layer2 {
 
+    init { onPayload() }
+
     override fun onPayload() {
         (payload as? Aware)?.onPayload(this)
     }
@@ -80,7 +82,7 @@ data class Ether(
     data class MAC(val raw: Ulong) {
         override fun toString(): String = raw.toFormattedMacAddress()
 
-        fun toByteArray() = bufferOf(raw)
+        fun toByteArray() = bufferOf(raw).copyOfRange(2, 8)
     }
 
     object Type : Formatter<Ushort> {

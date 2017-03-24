@@ -44,6 +44,13 @@ fun <K : OrgIProtocol<K>> IProtocolMarker<K>.of(raw: Raw, serializationContext: 
 
 fun ls(protocol: IProtocolMarker<*>) = println(Help.generate(protocol))
 
+fun IProtocol<*>.toByteArray(serializationContext: SerializationContext = DefaultSerializationEnvironment): ByteArray {
+    val array = ByteArray(65535)
+    val writer = ByteArraySimpleWriter(array)
+    serializationContext.serialize(this, writer, SerializationContext.Stage.Data)
+    return array.sliceArray(0 until writer.maxIndex)
+}
+
 @Suppress("UNCHECKED_CAST")
 inline fun <reified K: OrgIProtocolOption<in K>> lsOption() = println(Help.optionGenerate(K::class as KClass<IProtocolOption<*>>))
 

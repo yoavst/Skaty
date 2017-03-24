@@ -29,6 +29,8 @@ data class IP(var version: Byte = 4,
               override var _payload: IProtocol<*>? = null,
               override var parent: IProtocol<*>? = null) : BaseProtocol<IP>(), Ether.Aware, Layer3 {
 
+    init { onPayload() }
+
     override fun onPayload() {
         (payload as? Aware)?.onPayload(this)
     }

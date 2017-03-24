@@ -10,6 +10,7 @@ abstract class BaseProtocol<T : BaseProtocol<T>> : IContainerProtocol<T> {
         set(value) {
             _payload = value
             value?.parent = this
+            onPayload()
         }
 
     open fun onPayload() = Unit

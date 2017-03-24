@@ -8,6 +8,7 @@ import com.yoavst.skaty.serialization.ByteArraySimpleReader
 import org.pcap4j.core.PcapHandle
 import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode
 import org.pcap4j.core.Pcaps
+import unsigned.ul
 import java.io.Closeable
 import java.net.InetAddress
 import java.net.NetworkInterface
