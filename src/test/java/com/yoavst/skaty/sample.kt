@@ -15,14 +15,18 @@ import java.io.File
 fun main(args: Array<String>) {
     Network.init("192.168.1.110")
 
-    val packet = Ether(dst = mac("11-22-33-44-55-66")) /
+    val packet = Ether() /
             IP(dst = ip("192.168.1.1"), tos = 53.ub, options = optionsOf(IPOption.MTUProb(22.us))) /
-            TCP(dport = 80.us, sport = 1200.us, flags = flagsOf(SYN, ACK), options = optionsOf(TCPOption.NOP, TCPOption.Timestamp(1489416311.ui, 1.ui)), chksum = 53432.us) /
+            UDP(sport = 7000.us, dport = 7000.us) /
             "Hello world"
-    val raw = packet.toByteArray()
-    File("results.bin").writeBytes(raw)
-    val p = Ether.of(ByteArraySimpleReader(File("results.bin").readBytes()))
-    println(p)
+
+    repeat(50) {
+        Network.send(packet)
+    }
+//    val raw = packet.toByteArray()
+//    File("results.bin").writeBytes(raw)
+//    val p = Ether.of(ByteArraySimpleReader(File("results.bin").readBytes()))
+//    println(p)
 
 //    Network.sniff(timeout = 3000).filter { TCP in it }.dropRaw().forEach(::println)
 //

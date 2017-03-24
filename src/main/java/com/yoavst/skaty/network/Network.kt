@@ -67,4 +67,8 @@ object Network : Closeable {
             packet
         }
     }
+
+    fun send(packet: Ether) {
+        sendHandle.sendPacket(packet.toByteArray())
+    }
 }

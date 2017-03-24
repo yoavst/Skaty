@@ -13,7 +13,7 @@ internal fun Uint.toFormattedIpAddress(): String {
     return "${(this shr 24) and 0xFF}.${(this shr 16) and 0xFF}.${(this shr 8) and 0xFF}.${this and 0xFF}"
 }
 
-internal fun String.toMacAddress() = BigInteger(replace("-", ""), 16).toUlong()
+internal fun String.toMacAddress() = BigInteger(replace("-", "").replace(":","").toLowerCase(), 16).toUlong()
 
 internal fun Ulong.toFormattedMacAddress(): String {
     return ((this shr 40).toUbyte().toInt().toString(16).padStart(2, '0') + "-" +
@@ -50,8 +50,3 @@ internal fun calcChecksum(data: ByteArray): Short {
 
     return sum.inv().toShort()
 }
-
-/**
- * If it ever goes out of POC, should be removed
- */
-inline internal fun unsafe(code: () -> Unit) = code()
