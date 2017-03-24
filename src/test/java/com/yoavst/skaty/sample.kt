@@ -1,14 +1,13 @@
 package com.yoavst.skaty
 
 import com.yoavst.skaty.model.flagsOf
+import com.yoavst.skaty.network.Network
+import com.yoavst.skaty.network.Network.send
+import com.yoavst.skaty.network.Network.sendp
 import com.yoavst.skaty.protocols.*
 import com.yoavst.skaty.protocols.TCP.Flag.ACK
 import com.yoavst.skaty.protocols.TCP.Flag.SYN
 import com.yoavst.skaty.serialization.ByteArraySimpleReader
-import com.yoavst.skaty.network.Network
-import com.yoavst.skaty.network.Network.send
-import com.yoavst.skaty.network.Network.sendp
-import org.pcap4j.packet.UdpPacket
 import unsigned.ub
 import unsigned.ui
 import unsigned.us

@@ -4,8 +4,8 @@ import com.yoavst.skaty.model.Formatted
 import com.yoavst.skaty.model.Formatter
 import com.yoavst.skaty.model.formatter
 import com.yoavst.skaty.protocols.BaseProtocol
-import com.yoavst.skaty.protocols.declarations.IContainerProtocol
-import com.yoavst.skaty.protocols.declarations.IProtocol
+import com.yoavst.skaty.protocols.IContainerProtocol
+import com.yoavst.skaty.protocols.IProtocol
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.companionObjectInstance

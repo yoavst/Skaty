@@ -1,8 +1,8 @@
 package com.yoavst.skaty.utils
 
 import com.yoavst.skaty.model.Exclude
-import com.yoavst.skaty.protocols.declarations.IProtocolMarker
-import com.yoavst.skaty.protocols.declarations.IProtocolOption
+import com.yoavst.skaty.protocols.IProtocolMarker
+import com.yoavst.skaty.protocols.IProtocolOption
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.declaredMemberProperties

@@ -1,4 +1,6 @@
-package com.yoavst.skaty.protocols.declarations
+@file:Suppress("PackageDirectoryMismatch")
+
+package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.model.Exclude
 import com.yoavst.skaty.serialization.SerializationContext.Stage

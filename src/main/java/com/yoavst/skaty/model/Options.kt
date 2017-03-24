@@ -1,6 +1,6 @@
 package com.yoavst.skaty.model
 
-import com.yoavst.skaty.protocols.declarations.IProtocol
+import com.yoavst.skaty.protocols.IProtocol
 
 class Options<Option : IProtocol<Option>>(private val data: MutableList<Option>) : MutableList<Option> by data {
     @Suppress("UNCHECKED_CAST")

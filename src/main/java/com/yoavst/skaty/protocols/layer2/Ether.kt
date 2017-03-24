@@ -5,16 +5,12 @@ package com.yoavst.skaty.protocols
 import com.yoavst.skaty.model.Formatted
 import com.yoavst.skaty.model.Formatter
 import com.yoavst.skaty.network.Network
-import com.yoavst.skaty.protocols.declarations.IProtocol
-import com.yoavst.skaty.protocols.declarations.IProtocolMarker
-import com.yoavst.skaty.protocols.declarations.Layer2
 import com.yoavst.skaty.serialization.*
 import com.yoavst.skaty.serialization.SerializationContext.Stage
 import com.yoavst.skaty.utils.ToString
 import mu.KLogging
 import unsigned.Ulong
 import unsigned.Ushort
-import unsigned.toUlong
 import unsigned.us
 
 data class Ether(

@@ -1,6 +1,5 @@
 package com.yoavst.skaty.protocols
 
-import com.yoavst.skaty.protocols.declarations.IProtocolMarker
 import com.yoavst.skaty.utils.Help
 import com.yoavst.skaty.model.Options
 import com.yoavst.skaty.pcap.Pcap
@@ -8,16 +7,6 @@ import com.yoavst.skaty.serialization.*
 import java.io.File
 import java.net.InetAddress
 import kotlin.reflect.KClass
-import com.yoavst.skaty.protocols.declarations.IProtocol as OrgIProtocol
-import com.yoavst.skaty.protocols.declarations.IProtocolOption as OrgIProtocolOption
-
-typealias IProtocol<K> = OrgIProtocol<K>
-typealias IProtocolOption<K> = OrgIProtocolOption<K>
-typealias IProtocolMarker<K> = com.yoavst.skaty.protocols.declarations.IProtocolMarker<K>
-typealias IContainerProtocol<K> = com.yoavst.skaty.protocols.declarations.IContainerProtocol<K>
-typealias Layer2 = com.yoavst.skaty.protocols.declarations.Layer2
-typealias Layer3 = com.yoavst.skaty.protocols.declarations.Layer3
-typealias Layer4 = com.yoavst.skaty.protocols.declarations.Layer4
 
 fun mac(address: String): Ether.MAC = Ether.MAC(address.toMacAddress())
 
@@ -43,7 +32,7 @@ fun pcapOf(path: String): Pcap? = pcapOf(File(path))
 
 fun pcapOf(file: File): Pcap? = Pcap.of(BufferSimpleReader(file.readBytes()))
 
-fun <K : OrgIProtocol<K>> IProtocolMarker<K>.of(raw: Raw, serializationContext: SerializationContext = DefaultSerializationEnvironment): K? {
+fun <K : IProtocol<K>> IProtocolMarker<K>.of(raw: Raw, serializationContext: SerializationContext = DefaultSerializationEnvironment): K? {
     return of(ByteArraySimpleReader(raw.load), serializationContext)
 }
 
@@ -57,8 +46,8 @@ fun IProtocol<*>.toByteArray(serializationContext: SerializationContext = Defaul
 }
 
 @Suppress("UNCHECKED_CAST")
-inline fun <reified K: OrgIProtocolOption<in K>> lsOption() = println(Help.optionGenerate(K::class as KClass<IProtocolOption<*>>))
+inline fun <reified K: IProtocolOption<in K>> lsOption() = println(Help.optionGenerate(K::class as KClass<IProtocolOption<*>>))
 
 // kotlin type alias bug, uses original class
-fun <K : OrgIProtocol<K>> optionsOf(vararg options: K) = Options(options.toMutableList())
-fun <K : OrgIProtocol<K>> emptyOptions() = optionsOf<K>()
+fun <K : IProtocol<K>> optionsOf(vararg options: K) = Options(options.toMutableList())
+fun <K : IProtocol<K>> emptyOptions() = optionsOf<K>()

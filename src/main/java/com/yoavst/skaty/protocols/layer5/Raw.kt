@@ -4,7 +4,6 @@ package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.model.Formatted
 import com.yoavst.skaty.model.Formatter
-import com.yoavst.skaty.protocols.declarations.IProtocol
 import com.yoavst.skaty.serialization.*
 import com.yoavst.skaty.serialization.SerializationContext.Stage
 import com.yoavst.skaty.utils.ToString

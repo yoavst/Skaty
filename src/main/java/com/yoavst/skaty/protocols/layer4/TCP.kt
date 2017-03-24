@@ -3,9 +3,6 @@
 package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.model.*
-import com.yoavst.skaty.protocols.declarations.IProtocol
-import com.yoavst.skaty.protocols.declarations.IProtocolMarker
-import com.yoavst.skaty.protocols.declarations.Layer4
 import com.yoavst.skaty.serialization.*
 import com.yoavst.skaty.serialization.SerializationContext.Stage
 import com.yoavst.skaty.utils.ToString
