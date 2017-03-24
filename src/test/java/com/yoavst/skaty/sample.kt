@@ -6,6 +6,7 @@ import com.yoavst.skaty.protocols.TCP.Flag.ACK
 import com.yoavst.skaty.protocols.TCP.Flag.SYN
 import com.yoavst.skaty.serialization.ByteArraySimpleReader
 import com.yoavst.skaty.network.Network
+import com.yoavst.skaty.network.Network.sendp
 import org.pcap4j.packet.UdpPacket
 import unsigned.ub
 import unsigned.ui
@@ -15,37 +16,34 @@ import java.io.File
 fun main(args: Array<String>) {
     Network.init("192.168.1.110")
 
-    val packet = Ether() /
-            IP(dst = ip("192.168.1.1"), tos = 53.ub, options = optionsOf(IPOption.MTUProb(22.us))) /
-            UDP(sport = 7000.us, dport = 7000.us) /
-            "Hello world"
+    testSending()
 
-    repeat(50) {
-        Network.send(packet)
-    }
-//    val raw = packet.toByteArray()
-//    File("results.bin").writeBytes(raw)
-//    val p = Ether.of(ByteArraySimpleReader(File("results.bin").readBytes()))
-//    println(p)
-
-//    Network.sniff(timeout = 3000).filter { TCP in it }.dropRaw().forEach(::println)
-//
     Thread.sleep(1000)
     Network.close()
     println("done")
 }
 
-fun testResourceOf(file: String): File = File("src/test/resources/$file")
+fun testSending() {
+    val packet = Ether() /
+            IP(dst = ip("192.168.1.1"), tos = 53.ub, options = optionsOf(IPOption.MTUProb(22.us))) /
+            UDP(sport = 7000.us, dport = 7000.us) /
+            "Hello world"
 
-fun hexStringToByteArray(s: String): ByteArray {
-    val len = s.length
-    val data = ByteArray(len / 2)
-    var i = 0
-    while (i < len) {
-        data[i / 2] = ((Character.digit(s[i], 16) shl 4) + Character.digit(s[i + 1], 16)).toByte()
-        i += 2
-    }
-    return data
+    sendp(packet)
+}
+
+fun testSerializing() {
+    val packet = Ether() /
+            IP(dst = ip("192.168.1.1"), tos = 53.ub, options = optionsOf(IPOption.MTUProb(22.us))) /
+            UDP(sport = 7000.us, dport = 7000.us) /
+            "Hello world"
+
+    val raw = packet.toByteArray()
+
+    File("results.bin").writeBytes(raw)
+    val p = Ether.of(ByteArraySimpleReader(File("results.bin").readBytes()))
+    println(p)
+
 }
 
 fun testReadingPcap() {
@@ -79,21 +77,26 @@ fun showcase() {
 
     // send packet
     sendp(packet)
-    val ip = packet[IP]
-    send(ip)
-    val response = sr1(ip, timeout = 2000)
-    if (response != null) {
-        println(response[Raw])
-    }
 
     // sniff
     val packets = Network.sniff(timeout = 2000).filter { TCP in it && it[TCP].dport == 1200.us }.take(10).map { item -> item[TCP].ack }.toList()
     packets.forEach(::println)
 }
 
-fun sendp(packet: Layer2) {}
-fun send(packet: Layer3) {}
-fun sr1(packet: Layer3, timeout: Long = 1000): IProtocol<*>? = packet as IProtocol<*>
+//region Utils
+fun testResourceOf(file: String): File = File("src/test/resources/$file")
+
+fun hexStringToByteArray(s: String): ByteArray {
+    val len = s.length
+    val data = ByteArray(len / 2)
+    var i = 0
+    while (i < len) {
+        data[i / 2] = ((Character.digit(s[i], 16) shl 4) + Character.digit(s[i + 1], 16)).toByte()
+        i += 2
+    }
+    return data
+}
+
 fun <K : IProtocol<*>> Sequence<K>.dropRaw(): Sequence<K> = onEach {
     var last: IProtocol<*>? = it
     while (last is IContainerProtocol<*>) {
@@ -104,4 +107,5 @@ fun <K : IProtocol<*>> Sequence<K>.dropRaw(): Sequence<K> = onEach {
             last = last.payload
     }
 }
+//endregion
 
