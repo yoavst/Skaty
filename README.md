@@ -19,8 +19,8 @@ fun showcase() {
     
     // work with properties
     packet.dst = mac("AA-BB-CC-DD-EE-FF")
-        del(packet::dst)
-        println(packet)
+    del(packet::dst)
+    println(packet)
         
     // get a layer
     val tcp = packet[TCP]
