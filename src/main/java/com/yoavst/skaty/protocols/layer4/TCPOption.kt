@@ -7,6 +7,7 @@ import com.yoavst.skaty.protocols.declarations.IProtocol
 import com.yoavst.skaty.protocols.declarations.IProtocolMarker
 import com.yoavst.skaty.protocols.declarations.IProtocolOption
 import com.yoavst.skaty.serialization.*
+import com.yoavst.skaty.serialization.SerializationContext.Stage
 import com.yoavst.skaty.utils.ToString
 import mu.KLogging
 import unsigned.*
@@ -46,12 +47,34 @@ sealed class TCPOption(val kind: Ubyte, val length: Ubyte = 0.ub, val data: Byte
 
     override fun headerSize(): Int = 2
 
+    override fun write(writer: SimpleWriter, stage: Stage) {
+        when (stage) {
+            Stage.Data -> {
+                writer.writeUbyte(kind)
+                if (length.toInt() != 0) {
+                    writer.writeUbyte(length)
+                    if (data != null)
+                        writer.writeByteArray(data)
+                }
+            }
+            Stage.Length -> {
+                writer.skip(1)
+                if (length.toInt() != 0)
+                    writer.skip(length.toInt() - 1 + (data?.size ?: 0))
+            }
+            Stage.Checksum -> {
+                val length = length.toInt()
+                writer.index -= if (length == 0) 1 else length
+            }
+        }
+    }
+
     //region Options
-    object EndOfOptions : TCPOption(0.ub)  {
+    object EndOfOptions : TCPOption(0.ub) {
         override fun headerSize(): Int = 1
     }
 
-    object NOP : TCPOption(1.ub)  {
+    object NOP : TCPOption(1.ub) {
         override fun headerSize(): Int = 1
     }
 

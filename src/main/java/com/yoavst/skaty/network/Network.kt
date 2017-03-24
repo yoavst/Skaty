@@ -3,12 +3,14 @@ package com.yoavst.skaty.network
 import com.yoavst.skaty.protocols.Ether
 import com.yoavst.skaty.protocols.IProtocol
 import com.yoavst.skaty.protocols.Raw
+import com.yoavst.skaty.protocols.mac
 import com.yoavst.skaty.serialization.ByteArraySimpleReader
 import org.pcap4j.core.PcapHandle
 import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode
 import org.pcap4j.core.Pcaps
 import java.io.Closeable
 import java.net.InetAddress
+import java.net.NetworkInterface
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
 
@@ -16,11 +18,17 @@ import kotlin.concurrent.thread
 object Network : Closeable {
     private lateinit var readHandle: PcapHandle
     private lateinit var sendHandle: PcapHandle
+    private lateinit var address: InetAddress
 
     internal var index: AtomicLong = AtomicLong(0)
     internal var currentPacket: Pair<IProtocol<*>, Long> = Raw(ByteArray(0)) to index.get()
+
+    val macAddress: Ether.MAC
+        get() = mac(NetworkInterface.getByInetAddress(address).hardwareAddress)
+
     fun init(ip: String) {
-        val nif = Pcaps.getDevByAddress(InetAddress.getByName(ip))
+        address = InetAddress.getByName(ip)
+        val nif = Pcaps.getDevByAddress(address)
         sendHandle = nif.openLive(65536, PromiscuousMode.NONPROMISCUOUS, 0)
         Runtime.getRuntime().addShutdownHook(Thread {
             close()

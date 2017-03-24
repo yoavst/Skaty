@@ -41,10 +41,9 @@ data class UDP(var sport: Ushort = 53.us,
             Stage.Checksum -> {
                 if (parent !is IP) {
                     // Checksum is not supported
-                    writer.index -= 8
+                    writer.index -= headerSize()
                 } else {
-                    writer.index -= 8
-
+                    writer.index -= headerSize()
                 }
             }
         }

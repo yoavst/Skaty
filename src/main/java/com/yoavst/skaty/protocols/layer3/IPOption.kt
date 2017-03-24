@@ -7,7 +7,9 @@ import com.yoavst.skaty.protocols.declarations.IProtocol
 import com.yoavst.skaty.protocols.declarations.IProtocolMarker
 import com.yoavst.skaty.protocols.declarations.IProtocolOption
 import com.yoavst.skaty.serialization.*
+import com.yoavst.skaty.serialization.SerializationContext.Stage
 import com.yoavst.skaty.utils.clearLeftBits
+import com.yoavst.skaty.utils.toInt
 import mu.KLogging
 import unsigned.*
 
@@ -34,6 +36,28 @@ sealed class IPOption(val copied: Boolean, val clazz: Class, val number: Byte, v
     override fun toString(): String = name + value().let { if (it.isEmpty()) it else "[$it]" }
 
     override fun headerSize(): Int = 2
+
+    override fun write(writer: SimpleWriter, stage: Stage) {
+        when (stage) {
+            Stage.Data -> {
+                writer.writeUbyte((copied.toInt() shl 7 or clazz.value shl 5 or number.toInt()).ub)
+                if (length.toInt() != 0) {
+                    writer.writeUbyte(length)
+                    if (data != null)
+                        writer.writeByteArray(data)
+                }
+            }
+            Stage.Length -> {
+                writer.skip(1)
+                if (length.toInt() != 0)
+                    writer.skip(length.toInt() - 1 + (data?.size ?: 0))
+            }
+            Stage.Checksum -> {
+                val length = length.toInt()
+                writer.index -= if (length == 0) 1 else length
+            }
+        }
+    }
 
     //region Options
     object EndOfOptions : IPOption(false, Class.Control, 0) {

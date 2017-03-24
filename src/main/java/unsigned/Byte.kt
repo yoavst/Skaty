@@ -57,6 +57,7 @@ infix fun Byte.and(b: Ubyte) = this and b.v
 infix fun Byte.or(b: Ubyte) = this or b.v
 infix fun Byte.xor(b: Ubyte) = this xor b.v
 infix fun Byte.shl(b: Ubyte) = (toInt() shl b.toInt()).toByte()
+infix fun Byte.shl(b: Byte) = (toInt() shl b.toInt()).toByte()
 
 infix fun Byte.udiv(b: Ubyte) = (toUInt() / b.toInt()).toByte()
 infix fun Byte.urem(b: Ubyte) = (toUInt() % b.toInt()).toByte()

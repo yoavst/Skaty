@@ -25,14 +25,16 @@ fun SimpleWriter.writeUint(value: Uint) = writeInt(value.toInt())
 fun SimpleWriter.writeUlong(value: Ulong) = writeLong(value.toLong())
 fun SimpleWriter.writeString(value: String, charset: Charset = Charsets.UTF_8) = writeByteArray(value.toByteArray(charset))
 fun SimpleWriter.skip(bytes: Int): Int {
-    if (bytes + index >= size) {
-        val d = size - index - 1
-        index = size - 1
-        return d
-    }
+    if (bytes > 0) {
+        if (bytes + index >= size) {
+            val d = size - index - 1
+            index = size - 1
+            return d
+        }
 
-    index += bytes
-    return bytes
+        index += bytes
+        return bytes
+    } else return 0
 }
 
 interface SimpleReader : Closeable {

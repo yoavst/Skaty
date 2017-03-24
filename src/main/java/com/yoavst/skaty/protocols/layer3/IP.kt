@@ -7,6 +7,7 @@ import com.yoavst.skaty.protocols.declarations.IProtocol
 import com.yoavst.skaty.protocols.declarations.IProtocolMarker
 import com.yoavst.skaty.protocols.declarations.Layer3
 import com.yoavst.skaty.serialization.*
+import com.yoavst.skaty.serialization.SerializationContext.Stage
 import com.yoavst.skaty.utils.ToString
 import com.yoavst.skaty.utils.clearLeftBits
 import mu.KLogging
@@ -18,13 +19,13 @@ data class IP(var version: Byte = 4,
               var ecn: ECN = ECN.NonECT,
               var len: Ushort? = null,
               @property:Formatted(UshortHexFormatter::class) var id: Ushort = 1.us,
-              var flags: Flags<Flag>? = emptyFlags(),
+              var flags: Flags<Flag> = emptyFlags(),
               var ttl: Ubyte = 64.ub,
-              @property:Formatted(Protocol::class) var proto: Ubyte? = 0.ub,
+              @property:Formatted(Protocol::class) var proto: Ubyte = 0.ub,
               @property:Formatted(UshortHexFormatter::class) var chksum: Ushort? = null,
               var src: Address? = null,
               var dst: Address = ip("127.0.0.1"),
-              var options: Options<IPOption> = emptyOptions(),
+              val options: Options<IPOption> = emptyOptions(),
               override var _payload: IProtocol<*>? = null,
               override var parent: IProtocol<*>? = null) : BaseProtocol<IP>(), Ether.Aware, Layer3 {
 
@@ -45,6 +46,49 @@ data class IP(var version: Byte = 4,
             if (length == 0) 1 else length
         }
         return 20 + bytes + (bytes % 4)
+    }
+
+    override fun write(writer: SimpleWriter, stage: Stage) {
+        when (stage) {
+            Stage.Data -> {
+                writer.writeByte(version shl 4)
+                writer.writeUbyte(tos shl 2 or ecn.value)
+                writer.writeShort(0)
+                writer.writeUshort(id)
+                writer.writeUshort((Flag.values().filter { it in flags }.map(Flag::value).fold(0, Int::or) shl 15).us)
+                writer.writeUbyte(ttl)
+                writer.writeUbyte(proto)
+                writer.writeShort(0)
+                writer.writeByteArray((src ?: ip("127.0.0.1")).toByteArray()) //fixme
+                writer.writeByteArray(dst.toByteArray())
+                var size = 0
+                var current = writer.index
+                options.forEach {
+                    it.write(writer, stage)
+                    size += writer.index - current
+                    current = writer.index
+                }
+                while (size % 4 != 0) {
+                    options += IPOption.NOP
+                    IPOption.NOP.write(writer, Stage.Data)
+                    size += 1
+                }
+            }
+            Stage.Length -> {
+                val startingIndex = writer.index
+                val totalSize = headerSize()
+                len = (writer.maxIndex - writer.index - 1).us
+                writer.skip(2)
+                writer.writeUshort(len!!)
+                writer.index = startingIndex
+                writer.writeByte(version shl 4 or (totalSize / 4).ub)
+                ihl = (totalSize / 4).toByte()
+                writer.skip(totalSize - 1)
+            }
+            Stage.Checksum -> {
+                writer.index -= headerSize()
+            }
+        }
     }
 
     companion object : IProtocolMarker<IP>, KLogging() {

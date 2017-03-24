@@ -44,12 +44,14 @@ class ByteArraySimpleWriter(private val buffer: ByteBuffer, private val closing:
     }
 
     override fun writeByteArray(value: ByteArray, offset: Int, length: Int) {
-        if (length == -1) {
-            buffer.put(value)
-            updateMax()
-        } else {
-            buffer.put(value, offset, length)
-            updateMax()
+        if (value.isNotEmpty()) {
+            if (length == -1) {
+                buffer.put(value)
+                updateMax()
+            } else {
+                buffer.put(value, offset, length)
+                updateMax()
+            }
         }
     }
 

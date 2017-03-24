@@ -4,17 +4,17 @@ package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.model.Formatted
 import com.yoavst.skaty.model.Formatter
+import com.yoavst.skaty.network.Network
 import com.yoavst.skaty.protocols.declarations.IProtocol
 import com.yoavst.skaty.protocols.declarations.IProtocolMarker
 import com.yoavst.skaty.protocols.declarations.Layer2
-import com.yoavst.skaty.serialization.SerializationContext
-import com.yoavst.skaty.serialization.SimpleReader
-import com.yoavst.skaty.serialization.bufferOf
-import com.yoavst.skaty.serialization.readUshort
+import com.yoavst.skaty.serialization.*
+import com.yoavst.skaty.serialization.SerializationContext.Stage
 import com.yoavst.skaty.utils.ToString
 import mu.KLogging
 import unsigned.Ulong
 import unsigned.Ushort
+import unsigned.toUlong
 import unsigned.us
 
 data class Ether(
@@ -31,6 +31,22 @@ data class Ether(
     override fun toString(): String = ToString.generate(this)
     override val marker get() = Companion
     override fun headerSize(): Int = 14
+
+    override fun write(writer: SimpleWriter, stage: Stage) {
+        when (stage) {
+            Stage.Data -> {
+                writer.writeByteArray((dst ?: mac("FF:FF:FF:FF:FF:FF")).toByteArray())
+                writer.writeByteArray((src ?: Network.macAddress).toByteArray())
+                writer.writeUshort(type)
+            }
+            Stage.Length -> {
+                writer.skip(headerSize())
+            }
+            Stage.Checksum -> {
+                writer.index -= headerSize()
+            }
+        }
+    }
 
     companion object : IProtocolMarker<Ether>, KLogging() {
         override val name: String get() = "Ethernet"

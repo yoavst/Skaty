@@ -27,5 +27,5 @@ interface IProtocol<K : IProtocol<K>> {
      * [Stage.Checksum]: in: end :: out: start
      *
      */
-    fun write(writer: SimpleWriter, stage: Stage) = Unit
+    fun write(writer: SimpleWriter, stage: Stage)
 }
