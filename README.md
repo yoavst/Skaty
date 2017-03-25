@@ -36,6 +36,17 @@ fun showcase() {
 }
 ```
 
+## Features
+- [X] Create Ether, IP, TCP, UDP or Raw packets programmatically.
+- [X] Create new protocols and integrate them with the existing framework
+- [X] Serialize data to byte array
+- [X] Deserialize raw data to protocols using extensible deserializer.
+- [X] Read pcap files
+- [X] Send packets and sniff incoming packets
+- [ ] Sending and sniffing uses pcap4j and not self implementation
+- [ ] More protocols are needed
+- [ ] Serialization model need to be changed
+
 ## Initialization
 Currently, in order to initialize the library, you have to call `Network.init(String)` with the IP address of the network interface.
 
