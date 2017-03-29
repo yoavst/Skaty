@@ -7,7 +7,7 @@
 Skaty
 =====
 
-Introducing Skaty, the Kotlin port for [Scapy](http://www.secdev.org/projects/scapy/). Skaty is a POC therefore it lucks many important features. Do not use on production!
+Introducing Skaty, the Kotlin port for [Scapy](http://www.secdev.org/projects/scapy/). Skaty is a POC therefore it lacks many important features. Do not use on production!
 
 ```kotlin
 import com.yoavst.skaty.protocols.*
