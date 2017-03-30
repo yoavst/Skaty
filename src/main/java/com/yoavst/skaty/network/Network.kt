@@ -16,7 +16,7 @@ import kotlin.concurrent.thread
 object Network : Closeable {
     private lateinit var readHandle: PcapHandle
     private lateinit var sendHandle: PcapHandle
-    private lateinit var address: InetAddress
+    private var address: InetAddress = InetAddress.getByAddress(ip("127.0.0.1").toByteArray())
 
     internal var index: AtomicLong = AtomicLong(0)
     internal var currentPacket: Pair<IProtocol<*>, Long> = Raw(ByteArray(0)) to index.get()
