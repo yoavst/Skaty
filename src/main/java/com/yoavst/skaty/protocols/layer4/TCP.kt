@@ -53,8 +53,8 @@ data class TCP(var sport: Ushort = 20.us,
                     current = writer.index
                 }
                 while (size % 4 != 0) {
-                    options += TCPOption.NOP
-                    TCPOption.NOP.write(writer, Stage.Data)
+                    options += TCPOption.EndOfOptions
+                    TCPOption.EndOfOptions.write(writer, Stage.Data)
                     size += 1
                 }
 

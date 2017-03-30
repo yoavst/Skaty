@@ -73,8 +73,8 @@ data class IP(var version: Byte = 4,
                     current = writer.index
                 }
                 while (size % 4 != 0) {
-                    options += IPOption.NOP
-                    IPOption.NOP.write(writer, Stage.Data)
+                    options += IPOption.EndOfOptions
+                    IPOption.EndOfOptions.write(writer, Stage.Data)
                     size += 1
                 }
             }

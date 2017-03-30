@@ -2,6 +2,7 @@ package com.yoavst.skaty
 
 import com.yoavst.skaty.model.flagsOf
 import com.yoavst.skaty.network.Network
+import com.yoavst.skaty.network.Network.init
 import com.yoavst.skaty.network.Network.send
 import com.yoavst.skaty.network.Network.sendp
 import com.yoavst.skaty.protocols.*
@@ -54,9 +55,11 @@ fun testReadingSinglePacket() {
 }
 
 fun showcase() {
+    init("192.168.1.3")
+
     val packet = Ether(dst = mac("11-22-33-44-55-66")) /
             IP(dst = ip("192.168.1.1"), tos = 53.ub, options = optionsOf(IPOption.MTUProb(22.us))) /
-            TCP(dport = 80.us, sport = 1200.us, flags = flagsOf(SYN, ACK), options = optionsOf(TCPOption.NOP, TCPOption.Timestamp(1489416311.ui, 1.ui)), chksum = 53432.us) /
+            TCP(dport = 80.us, sport = 1200.us, flags = flagsOf(SYN, ACK), options = optionsOf(TCPOption.NOP, TCPOption.Timestamp(1489416311.ui, 1.ui))) /
             "Hello world"
 
     ls(IP)
@@ -75,7 +78,7 @@ fun showcase() {
     sendp(packet)
 
     // sniff
-    val packets = Network.sniff(timeout = 2000).filter { TCP in it && it[TCP].dport == 1200.us }.take(10).map { item -> item[TCP].ack }.toList()
+    val packets = Network.sniff(timeout = 2000).filter { TCP in it && it[TCP].dport == 1200.us }.take(10).toList()
     packets.forEach(::println)
 }
 
