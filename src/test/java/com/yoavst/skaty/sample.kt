@@ -9,6 +9,7 @@ import com.yoavst.skaty.protocols.*
 import com.yoavst.skaty.protocols.TCP.Flag.ACK
 import com.yoavst.skaty.protocols.TCP.Flag.SYN
 import com.yoavst.skaty.serialization.ByteArraySimpleReader
+import com.yoavst.skaty.serialization.DefaultSerializationEnvironment
 import unsigned.ub
 import unsigned.ui
 import unsigned.us
@@ -22,6 +23,9 @@ fun main(args: Array<String>) {
     Thread.sleep(1000)
     Network.close()
     println("done")
+
+    DefaultSerializationEnvironment.bind(TCP::dport, 3232, TestProtocol)
+    DefaultSerializationEnvironment.bind(TCP::sport, 3232, TestProtocol)
 }
 
 fun testSending() {
@@ -68,6 +72,8 @@ fun showcase() {
     packet.dst = mac("AA-BB-CC-DD-EE-FF")
     del(packet::dst)
     println(packet)
+
+    val p2 = packet.copy(type = 1.us)
 
     // get a layer
     val tcp = packet[TCP]

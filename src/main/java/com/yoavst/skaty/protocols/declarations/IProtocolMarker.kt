@@ -35,3 +35,4 @@ interface IProtocolMarker<K : IProtocol<K>> {
 
     operator fun invoke(reader: SimpleReader): K = of(reader) ?: throw IllegalArgumentException("reader does not represent $name protocol.")
 }
+
