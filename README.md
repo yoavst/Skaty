@@ -28,7 +28,7 @@ fun showcase() {
     println(TCP in packet)
     
     // send packet
-    sendp(packet[IP])
+    sendp(packet)
     
     // sniff packets
     val packets = sniff(timeout = 2000).filter { TCP in it && it[TCP].dport == 1200.us }.take(10).map { item -> item[TCP].ack }.toList()
