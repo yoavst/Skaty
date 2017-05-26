@@ -14,7 +14,7 @@ import com.yoavst.skaty.protocols.*
 import com.yoavst.skaty.network.Network.*
 
 fun showcase() {
-    val packet = IP(dst = ip("192.168.1.1"), options = optionsOf(IPOption.MTUProb(22.us))) / 
+    val packet = Ether() / IP(dst = ip("192.168.1.1"), options = optionsOf(IPOption.MTUProb(22.us))) / 
         UDP(sport = 7000.us, dport = 7000.us) / "Hello world"
     
     // work with properties
@@ -23,9 +23,9 @@ fun showcase() {
     println(packet)
         
     // get a layer
-    val tcp = packet[TCP]
+    val tcp = packet[UDP]
     println(tcp.dport)
-    println(UDP in packet)
+    println(TCP in packet)
     
     // send packet
     sendp(packet)
