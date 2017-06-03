@@ -2,7 +2,6 @@ package com.yoavst.skaty
 
 import com.yoavst.skaty.model.flagsOf
 import com.yoavst.skaty.network.Network
-import com.yoavst.skaty.network.Network.init
 import com.yoavst.skaty.network.Network.send
 import com.yoavst.skaty.network.Network.sendp
 import com.yoavst.skaty.protocols.*
@@ -16,11 +15,11 @@ import unsigned.us
 import java.io.File
 
 fun main(args: Array<String>) {
-    Network.init("192.168.1.110")
+    Network.init()
 
-    testSending()
+    val packets = Network.sniff(timeout = 5000).take(10).toList()
+    packets.forEach(::println)
 
-    Thread.sleep(1000)
     Network.close()
     println("done")
 
@@ -59,7 +58,7 @@ fun testReadingSinglePacket() {
 }
 
 fun showcase() {
-    init("192.168.1.3")
+    Network.init()
 
     val packet = Ether(dst = mac("11-22-33-44-55-66")) /
             IP(dst = ip("192.168.1.1"), tos = 53.ub, options = optionsOf(IPOption.MTUProb(22.us))) /

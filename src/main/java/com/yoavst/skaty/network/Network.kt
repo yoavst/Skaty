@@ -16,7 +16,7 @@ import kotlin.concurrent.thread
 object Network : Closeable {
     private lateinit var readHandle: PcapHandle
     private lateinit var sendHandle: PcapHandle
-    private var address: InetAddress = InetAddress.getByAddress(ip("127.0.0.1").toByteArray())
+    private var address: InetAddress = InetAddress.getLocalHost()
 
     internal var index: AtomicLong = AtomicLong(0)
     internal var currentPacket: Pair<IProtocol<*>, Long> = Raw(ByteArray(0)) to index.get()
@@ -27,8 +27,12 @@ object Network : Closeable {
     val ipAddress: IP.Address
         get() = ip(address.address)
 
-    fun init(ip: String) {
-        address = InetAddress.getByName(ip)
+    fun init(inetAddress: InetAddress) {
+        address = inetAddress
+        init()
+    }
+
+    fun init() {
         val nif = Pcaps.getDevByAddress(address)
         sendHandle = nif.openLive(65536, PromiscuousMode.NONPROMISCUOUS, 0)
         Runtime.getRuntime().addShutdownHook(Thread {
