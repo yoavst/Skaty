@@ -3,9 +3,6 @@
 package com.yoavst.skaty.protocols
 
 import com.yoavst.skaty.model.Exclude
-import com.yoavst.skaty.protocols.IProtocol
-import com.yoavst.skaty.protocols.IProtocolMarker
-import com.yoavst.skaty.protocols.IProtocolOption
 import com.yoavst.skaty.serialization.*
 import com.yoavst.skaty.serialization.SerializationContext.Stage
 import com.yoavst.skaty.utils.clearLeftBits

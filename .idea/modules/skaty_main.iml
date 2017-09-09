@@ -5,12 +5,11 @@
       <configuration version="3" platform="JVM 1.6" useProjectSettings="false">
         <compilerSettings />
         <compilerArguments>
-          <option name="destination" value="$MODULE_DIR$/../../build/kotlin-classes/main" />
-          <option name="classpath" value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.1.2-2/4d5466446af234c9dde2f7debbac8b4eb9534a15/kotlin-reflect-1.1.2-2.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/io.github.microutils/kotlin-logging/1.4.3/308badc76fcdf11c5f42d8f173ee6e224f45404a/kotlin-logging-1.4.3.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.1.2-2/2b22828f027e103dcd45f3aa240338bfdb53d16b/kotlin-stdlib-1.1.2-2.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/org.pcap4j/pcap4j-packetfactory-static/1.6.3/fb7a1fd82b1e13d08ea7252449b929c76952377f/pcap4j-packetfactory-static-1.6.3.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/org.pcap4j/pcap4j-core/1.6.3/4b12c01cce0f53abe61f3841f7ff76763e66a614/pcap4j-core-1.6.3.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.24/3f6b4bd4f8dbe8d4bea06d107a3826469b85c3e9/slf4j-api-1.7.24.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.2.1/fcc5b10cb812c41b00708e7b57baccc3aee5567c/jna-4.2.1.jar" />
+          <option name="destination" value="$MODULE_DIR$/../../build/classes/kotlin/main" />
+          <option name="classpath" value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.1.4-3/9994f843b30b9d6f4b39b742ffb8637eb86d08d8/kotlin-reflect-1.1.4-3.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/io.github.microutils/kotlin-logging/1.4.3/308badc76fcdf11c5f42d8f173ee6e224f45404a/kotlin-logging-1.4.3.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.1.4-3/7f07ece855a7d40d5ef430218593e92282ae2a74/kotlin-stdlib-1.1.4-3.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/org.pcap4j/pcap4j-packetfactory-static/1.6.3/fb7a1fd82b1e13d08ea7252449b929c76952377f/pcap4j-packetfactory-static-1.6.3.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/org.pcap4j/pcap4j-core/1.6.3/4b12c01cce0f53abe61f3841f7ff76763e66a614/pcap4j-core-1.6.3.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.24/3f6b4bd4f8dbe8d4bea06d107a3826469b85c3e9/slf4j-api-1.7.24.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar;C:/Users/yoavst/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.2.1/fcc5b10cb812c41b00708e7b57baccc3aee5567c/jna-4.2.1.jar" />
           <option name="noStdlib" value="true" />
           <option name="noReflect" value="true" />
           <option name="moduleName" value="skaty_main" />
-          <option name="jvmTarget" value="1.6" />
           <option name="addCompilerBuiltIns" value="true" />
           <option name="loadBuiltInsFromDependencies" value="true" />
           <option name="languageVersion" value="1.1" />
@@ -21,12 +20,13 @@
           <option name="pluginClasspaths">
             <array />
           </option>
+          <option name="version" value="true" />
         </compilerArguments>
       </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
-    <output url="file://$MODULE_DIR$/../../build/classes/java/main" />
+    <output url="file://$MODULE_DIR$/../../out/production/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../src/main">
       <sourceFolder url="file://$MODULE_DIR$/../../src/main/java" isTestSource="false" />
@@ -35,9 +35,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.1.2-2" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.1.4-3" level="project" />
     <orderEntry type="library" name="Gradle: io.github.microutils:kotlin-logging:1.4.3" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.1.2-2" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.1.4-3" level="project" />
     <orderEntry type="library" name="Gradle: org.pcap4j:pcap4j-packetfactory-static:1.6.3" level="project" />
     <orderEntry type="library" name="Gradle: org.pcap4j:pcap4j-core:1.6.3" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.24" level="project" />

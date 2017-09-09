@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath(kotlinModule(module = "gradle-plugin", version = "1.1.2-2"))
+        classpath(kotlinModule(module = "gradle-plugin", version = "1.1.4-3"))
     }
 }
 
@@ -16,8 +16,8 @@ repositories {
 }
 
 dependencies {
-    compile(kotlinModule(module ="stdlib", version = "1.1.2-2"))
-    compile(kotlinModule(module ="reflect", version = "1.1.2-2"))
+    compile(kotlinModule(module ="stdlib", version = "1.1.4-3"))
+    compile(kotlinModule(module ="reflect", version = "1.1.4-3"))
 
     compile("org.slf4j:slf4j-api:1.7.24")
     compile("io.github.microutils:kotlin-logging:1.4.3")

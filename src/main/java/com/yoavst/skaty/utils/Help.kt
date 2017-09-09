@@ -48,15 +48,14 @@ object Help : BasePrinter() {
 
     private fun String.cleanTypeName(): String {
         val indexGenerics = indexOf('<')
-        if (indexGenerics < 0) {
+        return if (indexGenerics < 0) {
             // no generics
             val index = lastIndexOf('.')
-            if (index < 0) return this
-            else return substring(index + 1)
+            if (index < 0) this else substring(index + 1)
         } else {
             val index = lastIndexOf('.', startIndex = indexGenerics)
-            if (index < 0) return substring(0, indexGenerics) + "<" + substring(indexGenerics + 1, length - 1).cleanTypeName() + ">"
-            else return substring(index + 1, indexGenerics) + "<" + substring(indexGenerics + 1, length - 1).cleanTypeName() + ">"
+            if (index < 0) substring(0, indexGenerics) + "<" + substring(indexGenerics + 1, length - 1).cleanTypeName() + ">"
+            else substring(index + 1, indexGenerics) + "<" + substring(indexGenerics + 1, length - 1).cleanTypeName() + ">"
         }
     }
 }

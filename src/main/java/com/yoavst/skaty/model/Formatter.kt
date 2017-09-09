@@ -2,7 +2,6 @@ package com.yoavst.skaty.model
 
 import unsigned.Ubyte
 import unsigned.Ushort
-import unsigned.toUint
 import kotlin.reflect.KClass
 
 interface Formatter<in K : Any> {

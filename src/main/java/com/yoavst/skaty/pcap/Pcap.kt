@@ -30,10 +30,7 @@ data class Pcap(var major: Ushort = 2.us, var minor: Ushort = 4.us, var thisZone
     }
 
     private fun IProtocol<*>.markerName(): String {
-        if (this is IContainerProtocol<*> && payload != null && !Raw.isProtocol(payload!!))
-            return payload!!.markerName()
-        else
-            return marker.name
+        return if (this is IContainerProtocol<*> && payload != null && !Raw.isProtocol(payload!!)) payload!!.markerName() else marker.name
     }
 
     override fun write(writer: SimpleWriter, stage: SerializationContext.Stage) {
